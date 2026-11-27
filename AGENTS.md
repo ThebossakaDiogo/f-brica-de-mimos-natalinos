@@ -28,3 +28,8 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## Project Architecture
+
+- Keep commercial parameters (plan prices, checkout URLs, guarantees, bonuses, license, verified testimonials, campaign date, Meta Pixel ID, and legal identity) centralized in `src/config/campaign.ts` so every UI section, modal, and test reads one source of truth without hardcoded commercial values.
+- Keep UTM capture, checkout URL enrichment, consent-aware Meta Pixel loading, and profit simulator calculations isolated in `src/lib/tracking.ts` so analytics never loads before explicit consent and simulator validation remains testable independent of UI rendering.
