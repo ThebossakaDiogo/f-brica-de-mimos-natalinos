@@ -1,13 +1,30 @@
 import { useState } from "react";
-import { ArrowRight, Scissors, Printer, Sparkles, Gift, MoveHorizontal } from "lucide-react";
+import {
+  ArrowRight,
+  Scissors,
+  Printer,
+  Sparkles,
+  Gift,
+  MoveHorizontal,
+  Store,
+} from "lucide-react";
 
 import heroConesImg from "@/assets/hero-cones.webp";
 import beforeSheetImg from "@/assets/before-sheet.webp";
 import afterConeImg from "@/assets/after-cone.webp";
 import { Button } from "@/components/ui/button";
-import { BENEFITS, FOUR_STEPS } from "@/config/content";
-import { CAMPAIGN_CONFIG } from "@/config/campaign";
-import { SnowfallOverlay } from "@/components/SnowfallOverlay";
+import {
+  BENEFITS,
+  FOUR_STEPS,
+  PRINT_CREATE_SELL_ROADMAP,
+  USE_CASES,
+} from "@/config/content";
+import {
+  CAMPAIGN_CONFIG,
+  formatUsd,
+  isPlanPriceConfigured,
+} from "@/config/campaign";
+import { SnowfallOverlay, TwinklingLightsOverlay } from "@/components/SnowfallOverlay";
 
 interface HeroAndStoryProps {
   onJumpToPlans: () => void;
@@ -17,34 +34,45 @@ const STEP_ICONS = [Printer, Scissors, Gift, Sparkles] as const;
 
 export function HeroAndStorySections({ onJumpToPlans }: HeroAndStoryProps) {
   const [revealPercent, setRevealPercent] = useState(52);
+  const basicPriceUsd = CAMPAIGN_CONFIG.plans.basic.priceUsd;
+  const heroPriceCopy = isPlanPriceConfigured(basicPriceUsd)
+    ? `Starting at ${formatUsd(basicPriceUsd)} USD`
+    : "One-time USD purchase (Basic & PRO)";
 
   return (
     <>
       <section
-        id="topo"
+        id="top"
         className="relative overflow-hidden bg-pine text-cream hero-vignette"
       >
         <SnowfallOverlay />
+        <TwinklingLightsOverlay />
 
         <header className="relative z-10 mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 pt-5 pb-3 sm:px-8 sm:pt-7">
           <a
-            href="#topo"
+            href="#top"
             className="font-display text-lg font-semibold tracking-tight text-cream sm:text-xl"
           >
             {CAMPAIGN_CONFIG.brandName}
           </a>
-          <nav aria-label="Navegação principal" className="hidden items-center gap-7 text-sm text-cream/80 md:flex">
-            <a href="#antes-depois" className="transition-colors hover:text-gold">
-              Antes &amp; Depois
+          <nav
+            aria-label="Primary navigation"
+            className="hidden items-center gap-7 text-sm text-cream/80 md:flex"
+          >
+            <a href="#before-after" className="transition-colors hover:text-gold">
+              Before &amp; After
             </a>
-            <a href="#catalogo" className="transition-colors hover:text-gold">
-              Catálogo
+            <a href="#steps" className="transition-colors hover:text-gold">
+              Roadmap
             </a>
-            <a href="#simulador" className="transition-colors hover:text-gold">
-              Simulador
+            <a href="#catalog" className="transition-colors hover:text-gold">
+              Catalog
             </a>
-            <a href="#planos" className="text-gold font-medium transition-colors hover:text-cream">
-              Ver planos
+            <a href="#calculator" className="transition-colors hover:text-gold">
+              USD Calculator
+            </a>
+            <a href="#plans" className="font-medium text-gold transition-colors hover:text-cream">
+              See Plans
             </a>
           </nav>
         </header>
@@ -53,17 +81,18 @@ export function HeroAndStorySections({ onJumpToPlans }: HeroAndStoryProps) {
           <div className="space-y-6">
             <p className="inline-flex items-center gap-2 text-xs font-semibold tracking-[0.18em] text-gold uppercase">
               <span className="h-px w-6 bg-gold/70" aria-hidden="true" />
-              {CAMPAIGN_CONFIG.editionLabel} • +500 Moldes Digitais
+              {CAMPAIGN_CONFIG.editionLabel} • 500+ Printable Templates
             </p>
 
             <h1 className="font-display text-4xl leading-[1.08] font-semibold tracking-tight text-cream sm:text-5xl lg:text-[3.55rem]">
-              Antes de gastar uma fortuna com lembrancinhas de Natal, veja o que você consegue fazer
-              com uma simples folha de papel.
+              Before you spend a fortune on Christmas favors, see what you can craft from a single
+              sheet of paper.
             </h1>
 
             <p className="max-w-xl text-base leading-relaxed text-cream/85 sm:text-lg">
-              Transforme papel em presentes encantadores com mais de 500 moldes natalinos prontos
-              para imprimir, recortar e montar.
+              Turn crisp cardstock and favorite holiday treats into boutique-worthy paper cones with
+              over 500 printable PDF templates. Craft meaningful gifts around your kitchen table —
+              or assemble finished seasonal sets to sell locally where the handmade license permits.
             </p>
 
             <div className="flex flex-col items-start gap-3 pt-2 sm:flex-row sm:items-center sm:gap-5">
@@ -74,25 +103,29 @@ export function HeroAndStorySections({ onJumpToPlans }: HeroAndStoryProps) {
                 onClick={onJumpToPlans}
                 className="w-full sm:w-auto"
               >
-                QUERO MEUS +500 MOLDES
+                GET MY 500+ TEMPLATES
                 <ArrowRight className="size-4" />
               </Button>
               <div className="text-sm text-cream/80">
-                <span className="font-semibold text-gold">A partir de R$ 10</span>
+                <span className="font-semibold text-gold">{heroPriceCopy}</span>
                 <span className="mx-2 text-gold/50">•</span>
-                <span>Acesso imediato em PDF</span>
+                <span>US Letter &amp; A4 PDFs</span>
               </div>
             </div>
           </div>
 
           <div className="relative mx-auto w-full max-w-md lg:max-w-none">
             <div
+              aria-hidden="true"
+              className="pointer-events-none absolute -inset-4 rounded-[2rem] bg-gold/10 blur-2xl"
+            />
+            <div
               data-parallax="hero"
-              className="relative overflow-hidden rounded-3xl border border-gold/25 bg-pine-surface editorial-shadow"
+              className="relative overflow-hidden rounded-3xl border border-gold/35 bg-pine-surface gold-halo"
             >
               <img
                 src={heroConesImg}
-                alt="Cones natalinos de papel feitos à mão em verde pinheiro, vermelho carmim e creme, recheados de trufas e doces"
+                alt="Handmade evergreen, cranberry, and ivory Christmas paper treat cones filled with chocolate truffles and festive sweets"
                 width={1024}
                 height={1536}
                 fetchPriority="high"
@@ -101,7 +134,7 @@ export function HeroAndStorySections({ onJumpToPlans }: HeroAndStoryProps) {
               />
               <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-linear-to-t from-pine/85 via-pine/25 to-transparent" />
               <p className="absolute right-5 bottom-4 left-5 text-xs tracking-wide text-cream/90">
-                Cones de papel A4 impressos, recortados e finalizados com fita de cetim e doces.
+                Printed on home cardstock, hand-cut with scissors, and finished with satin ribbon &amp; treats.
               </p>
             </div>
           </div>
@@ -110,15 +143,16 @@ export function HeroAndStorySections({ onJumpToPlans }: HeroAndStoryProps) {
         <div className="h-px w-full gold-rule" aria-hidden="true" />
       </section>
 
-      <section id="beneficios" className="bg-cream py-16 sm:py-24">
+      <section id="benefits" className="bg-cream py-16 editorial-paper sm:py-24">
         <div className="mx-auto max-w-6xl px-5 sm:px-8">
           <div data-reveal className="max-w-2xl">
             <h2 className="font-display text-3xl leading-tight font-semibold text-pine sm:text-4xl">
-              Lembranças memoráveis sem estourar o orçamento de dezembro
+              Memorable holiday craftsmanship without stretching your December budget
             </h2>
             <p className="mt-3 text-base leading-relaxed text-pine/75">
-              Cada detalhe dos moldes foi pensado para que qualquer pessoa alcance um acabamento
-              firme, limpo e elegante usando apenas impressora, tesoura e cola.
+              Every template is drafted for clean cuts, crisp creases, and structured sides — so
+              anyone with a printer, scissors, and craft glue can produce gift-shop presentation at
+              home.
             </p>
           </div>
 
@@ -138,43 +172,69 @@ export function HeroAndStorySections({ onJumpToPlans }: HeroAndStoryProps) {
               </article>
             ))}
           </div>
+
+          <div data-reveal className="mt-14 border-t border-pine/15 pt-10">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+              <h3 className="font-display text-2xl font-semibold text-pine">
+                Practical ways makers gift and sell their finished cones
+              </h3>
+              <p className="text-xs font-medium tracking-wider text-crimson uppercase">
+                Personal gifting &amp; handmade local sales
+              </p>
+            </div>
+            <div
+              data-stagger-group
+              className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5"
+            >
+              {USE_CASES.map((useCase) => (
+                <div
+                  key={useCase.label}
+                  data-stagger-item
+                  className="rounded-2xl border border-pine/12 bg-card p-4"
+                >
+                  <p className="font-display text-base font-semibold text-pine">{useCase.label}</p>
+                  <p className="mt-1.5 text-xs leading-relaxed text-pine/75">{useCase.detail}</p>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
-      <section id="antes-depois" className="bg-cream-warm py-16 sm:py-24">
+      <section id="before-after" className="bg-cream-warm py-16 sm:py-24">
         <div className="mx-auto max-w-6xl px-5 sm:px-8">
           <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] lg:gap-14">
             <div data-reveal className="space-y-5">
               <h2 className="font-display text-3xl leading-tight font-semibold text-pine sm:text-5xl">
-                Parece comprado em uma loja. Mas foi você quem fez.
+                Looks boutique-bought. Made by your own hands.
               </h2>
               <p className="text-base leading-relaxed text-pine/80">
-                Tudo começa com uma folha A4 impressa com as marcas exatas de corte e dobra. Em
-                poucos minutos, a folha lisa ganha volume, laço e recheio — pronta para encantar
-                quem recebe.
+                It all begins as a single flat sheet of printed cardstock with exact trim and score
+                guides. Minutes later, that flat sheet becomes a structured holiday keepsake tied
+                with satin ribbon and brimming with treats.
               </p>
               <div className="grid grid-cols-2 gap-4 border-t border-pine/15 pt-5 text-sm">
                 <div>
-                  <p className="font-semibold text-crimson">Antes</p>
+                  <p className="font-semibold text-crimson">Before</p>
                   <p className="mt-1 text-pine/75">
-                    1 folha A4 impressa com o molde escolhido e linhas de vinco.
+                    1 US Letter or A4 sheet printed with your chosen template and fold lines.
                   </p>
                 </div>
                 <div>
-                  <p className="font-semibold text-pine">Depois</p>
+                  <p className="font-semibold text-pine">After</p>
                   <p className="mt-1 text-pine/75">
-                    Cone firme de papelaria fina, recheado de doces e finalizado com fita.
+                    A sturdy, gift-shop paper cone filled with candies and finished with ribbon.
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-3 pt-1">
+              <div className="flex flex-wrap items-center gap-3 pt-1">
                 <Button
                   type="button"
                   variant={revealPercent < 40 ? "crimson" : "pineOutline"}
                   size="sm"
                   onClick={() => setRevealPercent(15)}
                 >
-                  Ver folha impressa
+                  See flat sheet
                 </Button>
                 <Button
                   type="button"
@@ -182,7 +242,7 @@ export function HeroAndStorySections({ onJumpToPlans }: HeroAndStoryProps) {
                   size="sm"
                   onClick={() => setRevealPercent(85)}
                 >
-                  Ver cone pronto
+                  See finished cone
                 </Button>
               </div>
             </div>
@@ -192,7 +252,7 @@ export function HeroAndStorySections({ onJumpToPlans }: HeroAndStoryProps) {
                 <div className="relative aspect-[4/5] w-full select-none">
                   <img
                     src={beforeSheetImg}
-                    alt="Antes: folha de papel A4 impressa com molde plano de cone natalino ao lado de tesoura e cola"
+                    alt="Before: flat printed Christmas cone paper template sheet beside scissors and glue"
                     width={900}
                     height={1350}
                     loading="lazy"
@@ -205,7 +265,7 @@ export function HeroAndStorySections({ onJumpToPlans }: HeroAndStoryProps) {
                   >
                     <img
                       src={afterConeImg}
-                      alt="Depois: cone natalino de papel montado com laço dourado e recheado de trufas e bengalas doces"
+                      alt="After: assembled Christmas paper treat cone tied with gold ribbon and filled with truffles and candy canes"
                       width={900}
                       height={1350}
                       loading="lazy"
@@ -225,10 +285,10 @@ export function HeroAndStorySections({ onJumpToPlans }: HeroAndStoryProps) {
                   </div>
 
                   <span className="pointer-events-none absolute top-4 left-4 rounded-full bg-pine/85 px-3 py-1 text-xs font-medium text-cream backdrop-blur-xs">
-                    Depois • Montado
+                    After • Assembled
                   </span>
                   <span className="pointer-events-none absolute top-4 right-4 rounded-full bg-cream/90 px-3 py-1 text-xs font-medium text-pine backdrop-blur-xs">
-                    Antes • Folha A4
+                    Before • Flat Sheet
                   </span>
 
                   <input
@@ -237,27 +297,28 @@ export function HeroAndStorySections({ onJumpToPlans }: HeroAndStoryProps) {
                     max={100}
                     value={revealPercent}
                     onChange={(event) => setRevealPercent(Number(event.target.value))}
-                    aria-label="Comparar antes e depois: arraste para revelar o cone montado"
+                    aria-label="Compare before and after: drag to reveal the assembled cone"
                     className="absolute inset-0 h-full w-full cursor-ew-resize opacity-0"
                   />
                 </div>
               </div>
               <p className="text-center text-xs text-pine/65">
-                Arraste sobre a imagem para comparar o molde impresso com o cone finalizado.
+                Drag across the image to compare the flat printed sheet with the finished cone.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      <section id="passos" className="bg-pine py-16 text-cream sm:py-24">
-        <div className="mx-auto max-w-6xl px-5 sm:px-8">
+      <section id="steps" className="relative overflow-hidden bg-pine py-16 text-cream gold-aura sm:py-24">
+        <div className="relative z-10 mx-auto max-w-6xl px-5 sm:px-8">
           <div data-reveal className="max-w-2xl">
             <h2 className="font-display text-3xl leading-tight font-semibold text-cream sm:text-4xl">
-              Quatro passos simples da folha até o presente pronto
+              Four effortless steps from flat paper to finished keepsake
             </h2>
             <p className="mt-3 text-base text-cream/75">
-              Sem software complicado nem equipamentos caros: só seguir a sequência.
+              No design software or specialty machines required — just follow the natural craft
+              rhythm.
             </p>
           </div>
 
@@ -271,7 +332,7 @@ export function HeroAndStorySections({ onJumpToPlans }: HeroAndStoryProps) {
                 <li
                   key={item.step}
                   data-stagger-item
-                  className="flex flex-col justify-between rounded-2xl border border-gold/20 bg-pine-surface p-6"
+                  className="flex flex-col justify-between rounded-2xl border border-gold/25 bg-pine-surface/90 p-6"
                 >
                   <div>
                     <div className="flex items-center justify-between">
@@ -291,7 +352,41 @@ export function HeroAndStorySections({ onJumpToPlans }: HeroAndStoryProps) {
               );
             })}
           </ol>
+
+          <div
+            data-reveal
+            className="mt-14 rounded-3xl border border-gold/30 bg-pine-surface/80 p-6 sm:p-8"
+          >
+            <div className="flex flex-col gap-3 border-b border-gold/20 pb-5 sm:flex-row sm:items-end sm:justify-between">
+              <div className="max-w-2xl">
+                <p className="inline-flex items-center gap-2 text-xs font-semibold tracking-[0.16em] text-gold uppercase">
+                  <Store className="size-3.5" aria-hidden="true" />
+                  Practical Print → Create → Sell Roadmap
+                </p>
+                <h3 className="mt-2 font-display text-2xl font-semibold text-cream sm:text-3xl">
+                  Want to earn seasonal extra income with handmade cones?
+                </h3>
+              </div>
+              <p className="max-w-xs text-xs leading-relaxed text-cream/70">
+                License covers physically assembled crafts you make yourself. Earnings are never
+                guaranteed and depend on your local demand, pricing, and effort.
+              </p>
+            </div>
+
+            <div data-stagger-group className="mt-6 grid gap-6 md:grid-cols-3">
+              {PRINT_CREATE_SELL_ROADMAP.map((phase) => (
+                <div key={phase.stage} data-stagger-item className="space-y-2">
+                  <p className="text-xs font-semibold tracking-wider text-gold uppercase">
+                    {phase.stage}
+                  </p>
+                  <h4 className="font-display text-lg font-semibold text-cream">{phase.title}</h4>
+                  <p className="text-sm leading-relaxed text-cream/75">{phase.detail}</p>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
+        <div className="mt-16 h-px w-full gold-rule sm:mt-24" aria-hidden="true" />
       </section>
     </>
   );

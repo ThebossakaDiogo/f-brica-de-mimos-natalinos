@@ -134,6 +134,7 @@
   --shadow-editorial: 0 22px 54px -22px color-mix(in oklab, var(--pine) 32%, transparent);
   --shadow-gold: 0 18px 40px -16px color-mix(in oklab, var(--gold) 35%, transparent);
   --shadow-crimson: 0 16px 34px -12px color-mix(in oklab, var(--crimson) 48%, transparent);
+  --shadow-gold-halo: 0 0 0 1px color-mix(in oklab, var(--gold) 45%, transparent), 0 24px 60px -18px color-mix(in oklab, var(--gold) 36%, transparent);
 }
 
 .dark {
@@ -229,9 +230,14 @@
 @utility hero-vignette {
   background-image:
     radial-gradient(
-      circle at 76% 32%,
-      color-mix(in oklab, var(--gold) 15%, transparent),
+      circle at 78% 28%,
+      color-mix(in oklab, var(--gold) 18%, transparent),
       transparent 52%
+    ),
+    radial-gradient(
+      circle at 18% 82%,
+      color-mix(in oklab, var(--crimson) 18%, transparent),
+      transparent 48%
     ),
     linear-gradient(
       180deg,
@@ -240,7 +246,56 @@
     );
 }
 
+@utility gold-aura {
+  background-image:
+    radial-gradient(
+      ellipse 68% 55% at 50% 0%,
+      color-mix(in oklab, var(--gold) 16%, transparent),
+      transparent 72%
+    ),
+    radial-gradient(
+      ellipse 45% 40% at 85% 90%,
+      color-mix(in oklab, var(--crimson) 14%, transparent),
+      transparent 70%
+    );
+}
+
+@utility gold-halo {
+  box-shadow: var(--shadow-gold-halo);
+}
+
+@utility editorial-paper {
+  background-image: radial-gradient(
+    circle at 88% 12%,
+    color-mix(in oklab, var(--gold) 14%, transparent),
+    transparent 45%
+  );
+}
+
 @utility catalog-scroll {
   scrollbar-width: thin;
   scrollbar-color: color-mix(in oklab, var(--gold) 55%, transparent) transparent;
+}
+
+@keyframes holiday-twinkle {
+  0%,
+  100% {
+    opacity: 0.22;
+    transform: scale(0.88);
+  }
+  50% {
+    opacity: 0.88;
+    transform: scale(1.18);
+  }
+}
+
+@utility twinkle-light {
+  animation: holiday-twinkle var(--twinkle-duration, 4.2s) ease-in-out var(--twinkle-delay, 0s)
+    infinite;
+  box-shadow: 0 0 12px 2px color-mix(in oklab, var(--gold) 65%, transparent);
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+    opacity: 0.45;
+  }
 }

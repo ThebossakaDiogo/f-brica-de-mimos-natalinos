@@ -11,6 +11,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { CATALOG_ITEMS, type CatalogItem } from "@/config/content";
+import { TwinklingLightsOverlay } from "@/components/SnowfallOverlay";
 
 export function CatalogAndEmotionSections() {
   const railRef = useRef<HTMLDivElement | null>(null);
@@ -38,7 +39,7 @@ export function CatalogAndEmotionSections() {
 
   return (
     <>
-      <section id="catalogo" className="overflow-x-clip bg-cream py-16 sm:py-24">
+      <section id="catalog" className="overflow-x-clip bg-cream py-16 editorial-paper sm:py-24">
         <div className="mx-auto max-w-6xl px-5 sm:px-8">
           <div
             data-reveal
@@ -46,11 +47,11 @@ export function CatalogAndEmotionSections() {
           >
             <div className="min-w-0 max-w-2xl">
               <h2 className="font-display text-3xl leading-tight font-semibold text-pine sm:text-4xl">
-                Uma amostra dos +500 moldes da coleção
+                A curated preview of the 500+ printable templates
               </h2>
               <p className="mt-2.5 text-base text-pine/75">
-                Deslize para explorar estilos clássicos, botânicos e escandinavos. Toque em
-                qualquer cone para ver em detalhe.
+                Scroll across heritage cranberry, evergreen botanical, and Nordic ivory styles. Tap
+                any cone to inspect paper weight and gifting ideas.
               </p>
             </div>
             <div className="flex shrink-0 items-center gap-2">
@@ -58,7 +59,7 @@ export function CatalogAndEmotionSections() {
                 type="button"
                 variant="pineOutline"
                 size="icon"
-                aria-label="Rolar catálogo para a esquerda"
+                aria-label="Scroll catalog left"
                 onClick={() => scrollRail("prev")}
                 className="rounded-full"
               >
@@ -68,7 +69,7 @@ export function CatalogAndEmotionSections() {
                 type="button"
                 variant="pineOutline"
                 size="icon"
-                aria-label="Rolar catálogo para a direita"
+                aria-label="Scroll catalog right"
                 onClick={() => scrollRail("next")}
                 className="rounded-full"
               >
@@ -87,7 +88,7 @@ export function CatalogAndEmotionSections() {
               key={item.id}
               type="button"
               onClick={() => setActiveIndex(idx)}
-              aria-label={`Ampliar ${item.title} no catálogo`}
+              aria-label={`Inspect ${item.title} in lightbox`}
               className="group w-[78vw] max-w-[300px] shrink-0 snap-start cursor-pointer text-left focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-gold-deep"
             >
               <div className="relative overflow-hidden rounded-2xl border border-pine/15 bg-pine">
@@ -146,21 +147,22 @@ export function CatalogAndEmotionSections() {
                         {activeItem.description}
                       </DialogDescription>
                     </DialogHeader>
-                    <p className="mt-5 border-t border-gold/20 pt-4 text-xs text-gold">
-                      Sugestão de acabamento: {activeItem.paperNote}
-                    </p>
+                    <div className="mt-5 space-y-2 border-t border-gold/20 pt-4 text-xs">
+                      <p className="text-gold">Suggested cardstock: {activeItem.paperNote}</p>
+                      <p className="text-cream/75">{activeItem.occasionNote}</p>
+                    </div>
                   </div>
 
                   <div className="mt-6 flex items-center justify-between gap-3 border-t border-gold/20 pt-4">
                     <span className="text-xs text-cream/65">
-                      {(activeIndex ?? 0) + 1} de {CATALOG_ITEMS.length}
+                      {(activeIndex ?? 0) + 1} of {CATALOG_ITEMS.length}
                     </span>
                     <div className="flex items-center gap-2">
                       <Button
                         type="button"
                         variant="creamOutline"
                         size="icon"
-                        aria-label="Modelo anterior"
+                        aria-label="Previous template"
                         onClick={() => navigateLightbox(-1)}
                         className="rounded-full"
                       >
@@ -170,7 +172,7 @@ export function CatalogAndEmotionSections() {
                         type="button"
                         variant="creamOutline"
                         size="icon"
-                        aria-label="Próximo modelo"
+                        aria-label="Next template"
                         onClick={() => navigateLightbox(1)}
                         className="rounded-full"
                       >
@@ -185,15 +187,16 @@ export function CatalogAndEmotionSections() {
         </Dialog>
       </section>
 
-      <section className="relative overflow-hidden bg-pine py-20 text-cream sm:py-28">
-        <div className="mx-auto grid max-w-6xl items-center gap-10 px-5 sm:px-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-16">
+      <section id="story" className="relative overflow-hidden bg-pine py-20 text-cream gold-aura sm:py-28">
+        <TwinklingLightsOverlay />
+        <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-10 px-5 sm:px-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-16">
           <div
             data-parallax="emotion"
-            className="overflow-hidden rounded-3xl border border-gold/25 bg-pine-surface editorial-shadow"
+            className="overflow-hidden rounded-3xl border border-gold/30 bg-pine-surface gold-halo"
           >
             <img
               src={emotionalHandsImg}
-              alt="Mãos amarrando uma fita dourada em um cone natalino de papel feito à mão diante de uma árvore iluminada"
+              alt="Hands tying a warm gold satin ribbon around a handmade Christmas paper cone in front of a glowing tree"
               width={900}
               height={1350}
               loading="lazy"
@@ -205,13 +208,15 @@ export function CatalogAndEmotionSections() {
           <blockquote data-reveal className="space-y-6">
             <div className="h-px w-14 bg-gold" aria-hidden="true" />
             <p className="font-display text-3xl leading-[1.2] font-medium text-cream italic sm:text-5xl">
-              “O melhor presente nem sempre é o mais caro. É aquele que carrega um pedacinho de
-              você.”
+              “The best gift isn&apos;t always the most expensive one. It&apos;s the one that
+              carries a piece of you.”
             </p>
             <p className="max-w-xl text-base leading-relaxed text-cream/80">
-              Quando alguém recebe um cone montado pelas suas mãos, sente o tempo, o carinho e o
-              cuidado em cada dobra. Um gesto simples que transforma papel e doces em memória de
-              Natal.
+              When a friend, teacher, or neighbor receives a treat cone folded and tied by hand,
+              they feel the thoughtfulness behind every crisp crease and satin bow. Whether you are
+              starting a cozy kitchen-table tradition with family or crafting small-batch favors for
+              your community, handmade details turn simple paper and sweets into lasting holiday
+              warmth.
             </p>
           </blockquote>
         </div>

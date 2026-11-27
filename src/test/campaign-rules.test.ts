@@ -2,77 +2,106 @@ import { describe, expect, it } from "vitest";
 
 import {
   CAMPAIGN_CONFIG,
+  formatUsd,
   getDaysUntilChristmas,
+  getPlanPriceLabel,
+  getUpgradePriceDifferenceUsd,
+  getUpgradeSavingsVsProUsd,
   isCheckoutConfigured,
+  isPlanPriceConfigured,
   isPlaceholderValue,
 } from "@/config/campaign";
 import { FAQ_ITEMS } from "@/config/content";
 import {
   buildCheckoutUrlWithUtms,
+  calculateBreakEvenUnits,
   calculateProfitSimulation,
   readUtmParamsFromSearch,
 } from "@/lib/tracking";
 
-describe("Regras comerciais da Fábrica de Mimos Natalinos", () => {
-  it("mantém os preços e prazos de garantia exatos dos planos e do upgrade", () => {
-    expect(CAMPAIGN_CONFIG.plans.essential.price).toBe(10);
-    expect(CAMPAIGN_CONFIG.plans.essential.guaranteeDays).toBe(7);
+describe("Christmas Treat Workshop commercial & USD compliance rules", () => {
+  it("keeps USD currency, actual guarantee windows, and unset configurable prices without inventing USD figures", () => {
+    expect(CAMPAIGN_CONFIG.currency).toBe("USD");
+    expect(CAMPAIGN_CONFIG.plans.basic.priceUsd).toBeNull();
+    expect(CAMPAIGN_CONFIG.plans.basic.guaranteeDays).toBe(7);
 
-    expect(CAMPAIGN_CONFIG.plans.premium.price).toBe(27.9);
-    expect(CAMPAIGN_CONFIG.plans.premium.guaranteeDays).toBe(30);
+    expect(CAMPAIGN_CONFIG.plans.pro.priceUsd).toBeNull();
+    expect(CAMPAIGN_CONFIG.plans.pro.guaranteeDays).toBe(30);
 
-    expect(CAMPAIGN_CONFIG.plans.essentialUpgrade.price).toBe(20);
-    expect(CAMPAIGN_CONFIG.plans.essentialUpgrade.guaranteeDays).toBe(30);
+    expect(CAMPAIGN_CONFIG.plans.basicUpgrade.priceUsd).toBeNull();
+    expect(CAMPAIGN_CONFIG.plans.basicUpgrade.guaranteeDays).toBe(30);
+
+    expect(isPlanPriceConfigured(CAMPAIGN_CONFIG.plans.basic.priceUsd)).toBe(false);
+    expect(getPlanPriceLabel(null)).toBe("USD price configurable");
+    expect(getUpgradePriceDifferenceUsd(null, null)).toBeNull();
   });
 
-  it("mantém exatamente 6 bônus e 10 perguntas de FAQ configuradas", () => {
+  it("computes exact USD upgrade price difference and savings when real USD prices are provided", () => {
+    expect(getUpgradePriceDifferenceUsd(9, 19)).toBe(10);
+    expect(getUpgradePriceDifferenceUsd(9.99, 19.99)).toBe(10);
+    expect(getUpgradeSavingsVsProUsd(27, 19)).toBe(8);
+    expect(formatUsd(19.99)).toBe("$19.99");
+  });
+
+  it("preserves all 6 bonuses and 10 FAQ items", () => {
     expect(CAMPAIGN_CONFIG.bonuses).toHaveLength(6);
     expect(FAQ_ITEMS).toHaveLength(10);
   });
 
-  it("mantém avaliações vazias por padrão e placeholders explícitos de checkout e Pixel", () => {
+  it("keeps testimonials empty by default and explicit placeholders for checkout and Meta Pixel", () => {
     expect(CAMPAIGN_CONFIG.testimonials).toHaveLength(0);
-    expect(isCheckoutConfigured(CAMPAIGN_CONFIG.plans.essential.checkoutUrl)).toBe(false);
-    expect(isCheckoutConfigured(CAMPAIGN_CONFIG.plans.premium.checkoutUrl)).toBe(false);
-    expect(isCheckoutConfigured(CAMPAIGN_CONFIG.plans.essentialUpgrade.checkoutUrl)).toBe(false);
+    expect(isCheckoutConfigured(CAMPAIGN_CONFIG.plans.basic.checkoutUrl)).toBe(false);
+    expect(isCheckoutConfigured(CAMPAIGN_CONFIG.plans.pro.checkoutUrl)).toBe(false);
+    expect(isCheckoutConfigured(CAMPAIGN_CONFIG.plans.basicUpgrade.checkoutUrl)).toBe(false);
     expect(isPlaceholderValue(CAMPAIGN_CONFIG.analytics.metaPixelId)).toBe(true);
   });
 
-  it("propaga parâmetros UTM apenas em URLs reais configuradas", () => {
+  it("preserves and appends UTM parameters only on configured live checkout URLs", () => {
     const utms = readUtmParamsFromSearch(
-      "?utm_source=instagram&utm_medium=cpc&utm_campaign=natal2026&fbclid=abc123",
+      "?utm_source=pinterest&utm_medium=cpc&utm_campaign=christmas2026&fbclid=xyz789",
     );
-    expect(utms.utm_source).toBe("instagram");
-    expect(utms.fbclid).toBe("abc123");
+    expect(utms.utm_source).toBe("pinterest");
+    expect(utms.fbclid).toBe("xyz789");
 
-    const configured = buildCheckoutUrlWithUtms("https://pay.exemplo.com/premium?ref=site", utms);
+    const configured = buildCheckoutUrlWithUtms("https://pay.example.com/pro?ref=site", utms);
     expect(configured).toContain("ref=site");
-    expect(configured).toContain("utm_source=instagram");
-    expect(configured).toContain("utm_campaign=natal2026");
+    expect(configured).toContain("utm_source=pinterest");
+    expect(configured).toContain("utm_campaign=christmas2026");
 
-    const unconfigured = buildCheckoutUrlWithUtms("CONFIGURE_CHECKOUT_URL_PREMIUM", utms);
-    expect(unconfigured).toBe("CONFIGURE_CHECKOUT_URL_PREMIUM");
+    const unconfigured = buildCheckoutUrlWithUtms("CONFIGURE_CHECKOUT_URL_PRO", utms);
+    expect(unconfigured).toBe("CONFIGURE_CHECKOUT_URL_PRO");
   });
 
-  it("calcula corretamente o simulador e limita entradas inválidas ou negativas", () => {
-    const sample = calculateProfitSimulation({ quantity: 40, unitPrice: 18, unitCost: 5.5 });
-    expect(sample.grossRevenue).toBe(720);
-    expect(sample.totalCost).toBe(220);
-    expect(sample.unitMargin).toBe(12.5);
-    expect(sample.estimatedNet).toBe(500);
+  it("calculates USD profit scenarios with overhead and clamps invalid or negative inputs", () => {
+    const sample = calculateProfitSimulation({
+      quantity: 40,
+      unitPrice: 8,
+      unitCost: 2.5,
+      extraBatchCost: 15,
+    });
+    expect(sample.grossRevenue).toBe(320);
+    expect(sample.materialCost).toBe(100);
+    expect(sample.totalCost).toBe(115);
+    expect(sample.unitMargin).toBe(5.5);
+    expect(sample.estimatedNet).toBe(205);
+    expect(sample.breakEvenUnits).toBe(3);
     expect(sample.isUnitLoss).toBe(false);
+    expect(sample.isNetLoss).toBe(false);
 
     const clamped = calculateProfitSimulation({
       quantity: -10,
       unitPrice: Number.NaN,
       unitCost: -5,
+      extraBatchCost: -20,
     });
     expect(clamped.quantity).toBe(1);
-    expect(clamped.unitPrice).toBe(18);
+    expect(clamped.unitPrice).toBe(8);
     expect(clamped.unitCost).toBe(0);
+    expect(clamped.extraBatchCost).toBe(0);
+    expect(calculateBreakEvenUnits(20, 0)).toBeNull();
   });
 
-  it("calcula dias reais até a data de Natal da campanha", () => {
+  it("calculates real calendar days remaining until the configured Christmas date", () => {
     const days = getDaysUntilChristmas(new Date("2026-12-20T12:00:00"));
     expect(days).toBe(5);
   });

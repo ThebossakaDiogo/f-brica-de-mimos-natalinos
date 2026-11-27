@@ -10,6 +10,7 @@ export interface CatalogItem {
   title: string;
   category: string;
   paperNote: string;
+  occasionNote: string;
   description: string;
   image: string;
   alt: string;
@@ -24,218 +25,273 @@ export interface FaqItem {
 export const BENEFITS = [
   {
     number: "01",
-    title: "Economia real sem abrir mão do charme",
+    title: "Boutique look at a fraction of store prices",
     description:
-      "Com uma folha A4 de papel firme e seus doces favoritos, você monta lembranças com aparência de boutique por uma fração do preço pronto.",
+      "Pair one sheet of sturdy cardstock with chocolates, peppermint bark, or homemade cookies to create heirloom-feel favors without boutique markups.",
   },
   {
     number: "02",
-    title: "Mais de 500 moldes prontos para imprimir",
+    title: "500+ curated holiday designs ready to print",
     description:
-      "Estampas clássicas, botânicas, nórdicas, infantis e minimalistas — com marcas de recorte e vinco já preparadas para facilitar a montagem.",
+      "Classic cranberry, botanical evergreen, Scandinavian ivory, playful gingerbread, and gilded motifs — each with clean trim and fold guides built in.",
   },
   {
     number: "03",
-    title: "Funciona com impressora comum ou gráfica",
+    title: "Home printer or local print shop ready",
     description:
-      "Os arquivos chegam em PDF tamanho A4 em alta definição para imprimir em casa ou levar à gráfica rápida da sua cidade.",
+      "High-resolution PDF files sized for US Letter and A4 paper so you can print on a standard home inkjet printer or at any neighborhood print shop.",
   },
   {
     number: "04",
-    title: "Presente afetivo ou renda artesanal",
+    title: "Heartfelt gifting or seasonal handmade income",
     description:
-      "Crie mimos para família, escola, amigos secretos e equipes — ou monte kits sob encomenda com controle total do seu custo.",
+      "Craft memorable favors for family tables, teachers, and coworkers — or assemble physical treat cones to sell locally under the handmade commercial license.",
+  },
+] as const;
+
+export const USE_CASES = [
+  {
+    label: "Family & Table Settings",
+    detail:
+      "Personalized place-setting cones filled with truffles or spiced nuts for Christmas Eve dinner.",
+  },
+  {
+    label: "Teachers & Classrooms",
+    detail:
+      "Coordinated ribboned favors you can assemble in an evening for teachers, coaches, and classmates.",
+  },
+  {
+    label: "Holiday Craft Fairs",
+    detail:
+      "Eye-catching display batches packaged in clear cellophane bags for weekend seasonal markets.",
+  },
+  {
+    label: "Office & Client Thank-Yous",
+    detail:
+      "Polished evergreen-and-gold cones ready for small businesses, salons, realtors, and local teams.",
+  },
+  {
+    label: "Local Pre-Order Gift Sets",
+    detail:
+      "Curated 4-pack or 12-pack handmade bundles shared with neighbors, church groups, and local networks.",
   },
 ] as const;
 
 export const FOUR_STEPS = [
   {
     step: "01",
-    title: "Imprimir",
+    title: "Print",
     description:
-      "Escolha o molde na coleção e imprima em folha A4 (recomendado papel 180g a 240g, fosco ou fotográfico).",
+      "Pick your favorite designs and print at 100% scale on 65–90 lb cardstock (180–240 gsm), matte or satin finish.",
   },
   {
     step: "02",
-    title: "Recortar",
+    title: "Cut",
     description:
-      "Siga as linhas externas limpas com tesoura comum — sem precisar de máquina de corte profissional.",
+      "Follow the crisp outer guidelines with everyday household scissors or a craft knife — no Cricut or cutting machine needed.",
   },
   {
     step: "03",
-    title: "Montar",
+    title: "Assemble",
     description:
-      "Dobre na aba indicada, passe um fio de cola ou fita dupla face e finalize o cone com laço ou tag.",
+      "Crease along the marked tab, seal cleanly with double-sided tape or craft glue, and finish with satin ribbon or a gift tag.",
   },
   {
     step: "04",
-    title: "Surpreender",
+    title: "Gift or Sell",
     description:
-      "Recheie com trufas, bombons, balas ou biscoitos e entregue uma lembrança que parece saída de loja.",
+      "Fill with truffles, biscotti, candy canes, or cocoa mix to delight loved ones — or package finished handmade sets for local buyers.",
+  },
+] as const;
+
+export const PRINT_CREATE_SELL_ROADMAP = [
+  {
+    stage: "Stage 01 • Print",
+    title: "Test one sheet & lock your supply cost",
+    detail:
+      "Run a 3-design sample batch on 65–90 lb cardstock, weigh your favorite fillings, and calculate your exact per-cone material cost in USD before buying in bulk.",
+  },
+  {
+    stage: "Stage 02 • Create",
+    title: "Batch-assemble a cohesive 3-style menu",
+    detail:
+      "Cut and fold in assembly-line order (print, cut, crease, seal, ribbon) so 20 to 50 cones come together cleanly in an evening with consistent boutique presentation.",
+  },
+  {
+    stage: "Stage 03 • Sell Locally",
+    title: "Photograph & take seasonal pre-orders",
+    detail:
+      "Snap natural-light photos of your assembled cones, offer single favors or 6- and 12-pack bundles to neighbors, schools, offices, or craft fairs, and produce to order.",
   },
 ] as const;
 
 export const CATALOG_ITEMS: readonly CatalogItem[] = [
   {
     id: "classic-red",
-    title: "Clássico Carmim & Ouro",
-    category: "Coleção Tradicional",
-    paperNote: "Papel fosco 180g + fita dourada",
+    title: "Classic Cranberry & Gold",
+    category: "Heritage Collection",
+    paperNote: "65 lb (180 gsm) matte cardstock + gold satin ribbon",
+    occasionNote: "Ideal for truffles, wrapped chocolates & holiday host gifts",
     description:
-      "Estampa vermelha profunda com detalhes dourados pensada para trufas artesanais, bombons e balas de hortelã.",
+      "Deep holiday cranberry paired with fine gilded flourishes — designed for artisan truffles, wrapped chocolates, and peppermint candies.",
     image: coneClassicRed,
-    alt: "Cone natalino de papel vermelho carmim com detalhes dourados recheado de trufas e bombons",
+    alt: "Handmade cranberry red Christmas paper cone with gold details filled with chocolate truffles",
   },
   {
     id: "pine-gold",
-    title: "Pinheiro Botânico",
-    category: "Coleção Editorial",
-    paperNote: "Offset 240g + acabamento fosco",
+    title: "Evergreen Botanical",
+    category: "Editorial Collection",
+    paperNote: "90 lb (240 gsm) smooth cardstock + matte finish",
+    occasionNote: "Ideal for dinner place settings & corporate thank-yous",
     description:
-      "Verde pinheiro fechado com ramos dourados para mesas postas, presentes corporativos e cestas natalinas.",
+      "Rich pine evergreen accented with botanical gold sprigs for holiday table settings, client appreciation favors, and curated gift baskets.",
     image: conePineGold,
-    alt: "Cone natalino de papel verde pinheiro com folhas douradas recheado de chocolates",
+    alt: "Deep evergreen Christmas paper cone with botanical gold foliage filled with chocolates",
   },
   {
     id: "nordic-cream",
-    title: "Nórdico Creme & Neve",
-    category: "Coleção Escandinava",
-    paperNote: "Papel creme texturizado 180g",
+    title: "Nordic Ivory & Snow",
+    category: "Scandinavian Collection",
+    paperNote: "65 lb (180 gsm) textured ivory cardstock",
+    occasionNote: "Ideal for shortbread cookies, marshmallows & cocoa toppers",
     description:
-      "Fundo creme acolhedor com flocos e traços vermelhos, ideal para biscoitos amanteigados, marshmallows e gotas de chocolate.",
+      "Warm ivory backdrop with crisp crimson snowflakes and Nordic stitchwork, tailored for butter cookies, marshmallows, and cocoa bombs.",
     image: coneNordicCream,
-    alt: "Cone natalino de papel creme com estampa nórdica vermelha recheado de biscoitos e marshmallows",
+    alt: "Warm ivory Scandinavian-style Christmas paper cone filled with cookies and marshmallows",
   },
   {
     id: "gingerbread",
-    title: "Pão de Mel & Frutas",
-    category: "Coleção Aconchego",
-    paperNote: "Papel kraft ou creme 200g",
+    title: "Gingerbread & Holly",
+    category: "Cozy Keepsake Collection",
+    paperNote: "75 lb (200 gsm) kraft or warm ivory paper",
+    occasionNote: "Ideal for classroom favors, neighbors & family stockings",
     description:
-      "Ilustração afetiva de casinhas natalinas e frutinhas vermelhas para lembranças de escola, família e amigos.",
+      "Storybook gingerbread cottages and winter berries crafted for teacher gifts, school parties, and charming family stocking stuffers.",
     image: coneGingerbread,
-    alt: "Cone natalino de papel em tons creme e vermelho com padrão de pão de mel recheado de doces",
+    alt: "Ivory and red gingerbread-patterned Christmas paper cone filled with festive sweets",
   },
   {
     id: "royal-velvet",
-    title: "Damasco & Veludo",
-    category: "Coleção Noite Feliz",
-    paperNote: "Fotográfico fosco 230g",
+    title: "Damask & Velvet",
+    category: "Silent Night Collection",
+    paperNote: "85 lb (230 gsm) matte photo cardstock",
+    occasionNote: "Ideal for boutique gift sets & craft market centerpieces",
     description:
-      "Combinação sofisticada de verde escuro, carmim e dourado para entregas que pedem presença de boutique.",
+      "An opulent pairing of deep evergreen, cranberry damask, and warm gold detailing built to stand out on holiday gift tables and craft displays.",
     image: coneRoyalVelvet,
-    alt: "Cone natalino de papel verde e vermelho damasco com acabamento dourado e chocolates",
+    alt: "Evergreen and cranberry damask Christmas paper cone with gold trim filled with chocolates",
   },
   {
     id: "atelier-kit",
-    title: "Conjunto Ateliê Completo",
-    category: "Coleção + Bônus Premium",
-    paperNote: "Cones + tags + caixinhas + cartões",
+    title: "Complete Workshop Suite",
+    category: "PRO Collection + 6 Bonuses",
+    paperNote: "Cones + coordinated gift tags + favor boxes + greeting cards",
+    occasionNote: "Ideal for matching holiday gift bundles & pre-order menus",
     description:
-      "Integração visual entre cones, etiquetas De/Para, caixinhas dobráveis e cartões coordenados no Plano Premium.",
+      "Visual harmony across cones, To/From tags, compact favor boxes, and matching greeting cards unlocked inside the PRO Plan.",
     image: coneAtelierKit,
-    alt: "Coleção natalina de papel com cones recheados, tags, caixinhas e cartões coordenados",
+    alt: "Coordinated handmade Christmas paper cone suite with matching gift tags, boxes, and greeting cards",
   },
 ];
 
 export const BENEFIT_ANCHOR_ITEMS = [
   {
-    label: "Mais de 500 moldes de cones natalinos",
-    detail: "Variedade para diferentes públicos, idades e estilos de celebração.",
-    essential: true,
-    premium: true,
+    label: "500+ printable Christmas cone templates",
+    detail: "Wide range of heirloom, Nordic, botanical, playful, and classic patterns.",
+    basic: true,
+    pro: true,
   },
   {
-    label: "Acesso imediato em PDF A4",
-    detail: "Prontos para imprimir em casa ou em gráfica rápida quantas vezes precisar.",
-    essential: true,
-    premium: true,
+    label: "Instant US Letter & A4 high-resolution PDFs",
+    detail: "Print at home or at any local copy shop as many times as you need.",
+    basic: true,
+    pro: true,
   },
   {
-    label: "Tutorial de impressão e montagem",
-    detail: "Versão básica no Essencial; versão completa de acabamento no Premium.",
-    essential: true,
-    premium: true,
+    label: "Printing & boutique-finish assembly tutorial",
+    detail: "Essential starter guide in Basic; complete cardstock & finishing manual in PRO.",
+    basic: true,
+    pro: true,
   },
   {
-    label: "Biblioteca organizada por categorias",
-    detail: "Encontre o estilo ideal em segundos sem perder tempo procurando pastas.",
-    essential: false,
-    premium: true,
+    label: "Theme-organized template library",
+    detail: "Browse by holiday palette, occasion, and style in seconds without digging through folders.",
+    basic: false,
+    pro: true,
   },
   {
-    label: "6 bônus completos (tags, caixinhas, cartões, manual e guias)",
-    detail: "Papelaria coordenada e apoio prático para montar e apresentar seus mimos.",
-    essential: false,
-    premium: true,
+    label: "All 6 curated bonuses (tags, boxes, cards, manual & guides)",
+    detail: "Coordinated stationery plus practical costing and local outreach templates.",
+    basic: false,
+    pro: true,
   },
   {
-    label: "Garantia incondicional",
-    detail: "7 dias no Plano Essencial • 30 dias no Plano Premium.",
-    essential: true,
-    premium: true,
+    label: "Handmade commercial license (physical crafts) & guarantee",
+    detail: "Sell assembled physical cones you make • 7-day Basic / 30-day PRO guarantee.",
+    basic: true,
+    pro: true,
   },
 ] as const;
 
 export const FAQ_ITEMS: readonly FaqItem[] = [
   {
     id: "faq-1",
-    question: "Como recebo acesso aos moldes após a compra?",
+    question: "How do I receive my templates after purchasing?",
     answer:
-      "Assim que o pagamento é confirmado pela plataforma oficial de checkout, você recebe o acesso digital imediatamente por e-mail para baixar os arquivos em PDF.",
+      "Immediately after payment is confirmed through the official checkout platform, you receive digital download access by email so you can save and print your PDF templates right away.",
   },
   {
     id: "faq-2",
-    question: "Preciso de máquina de corte (Silhouette ou Cricut)?",
+    question: "Do I need a cutting machine like a Cricut or Silhouette?",
     answer:
-      "Não. Todos os moldes foram desenhados para serem recortados facilmente com tesoura comum ou estilete, seguindo as linhas guias de corte e dobra.",
+      "Not at all. Every cone template is designed with clean outer trim lines and fold marks so you can cut them neatly with standard household scissors or a craft knife.",
   },
   {
     id: "faq-3",
-    question: "Qual papel é recomendado para ficar firme como de loja?",
+    question: "What paper weight works best for a sturdy boutique feel?",
     answer:
-      "Papel offset, fotográfico fosco ou vergê entre 180g e 240g em tamanho A4 oferece estrutura firme e ótimo acabamento. Se sua impressora aceitar apenas papel mais fino, você também pode imprimir em gráfica rápida.",
+      "We recommend 65 lb to 90 lb cardstock (180–240 gsm) in matte, smooth cover, or linen finish. If your home printer prefers lighter paper, any local print shop can print the PDFs on heavy cardstock for pennies per sheet.",
   },
   {
     id: "faq-4",
-    question: "Posso imprimir em impressora caseira comum?",
+    question: "Can I print these on a regular home printer in US Letter or A4?",
     answer:
-      "Sim. Os arquivos estão formatados em tamanho A4 padrão. Basta ajustar a impressão para 'Tamanho real (100%)' e qualidade alta.",
+      "Yes. The printable PDF files are prepared for both US Letter (8.5 × 11 in) and international A4 sheets. Simply select 'Actual Size (100%)' and Best/High print quality in your printer dialog.",
   },
   {
     id: "faq-5",
-    question: "O produto é físico ou digital?",
+    question: "Is this a physical shipment or a digital download?",
     answer:
-      "100% digital. Você não recebe cones nem doces pelo correio — recebe os moldes digitais prontos para imprimir, recortar, montar e rechear como preferir.",
+      "This is a 100% digital PDF product. No physical cones, ribbons, or candies are mailed — you download the printable templates and craft as many cones as you like with your own supplies.",
   },
   {
     id: "faq-6",
-    question: "Qual a diferença entre o Plano Essencial e o Plano Premium?",
+    question: "What is the difference between the Basic Plan and the PRO Plan?",
     answer:
-      "O Essencial (R$ 10,00) entrega os +500 moldes, tutorial básico, acesso imediato e garantia de 7 dias. O Premium (R$ 27,90) inclui tudo isso mais biblioteca organizada por categorias, tutorial completo, os 6 bônus exclusivos e garantia estendida de 30 dias.",
+      "The Basic Plan includes all 500+ printable cone templates, the starter printing and folding guide, instant PDF access, and a 7-day money-back guarantee. The PRO Plan includes everything in Basic plus a theme-organized library, the complete boutique-finish tutorial, all 6 curated bonuses, and an extended 30-day money-back guarantee.",
   },
   {
     id: "faq-7",
-    question: "Posso vender os cones que eu montar para fazer renda extra?",
+    question: "Can I sell the assembled cones for seasonal extra income?",
     answer:
-      "Sim. A licença permite produzir e vender as peças físicas montadas por você (recheadas ou vazias). O que não é permitido é revender, compartilhar ou redistribuir os arquivos digitais/moldes em PDF.",
+      "Yes, where permitted by the included handmade license: you may craft and sell physically assembled cones (filled or unfilled) at local markets, schools, offices, or through pre-orders. Reselling, sharing, or redistributing the digital PDF templates themselves is not permitted, and sales or earnings are never guaranteed.",
   },
   {
     id: "faq-8",
-    question: "Nunca trabalhei com papelaria personalizada. Vou conseguir montar?",
+    question: "I'm a complete beginner at paper crafting. Will I be able to assemble them?",
     answer:
-      "Sim. O molde de cone tem montagem intuitiva em quatro passos — imprimir, recortar, dobrar na aba e colar. Os tutoriais acompanham dicas simples para um fechamento limpo.",
+      "Yes. Each cone follows a forgiving four-step rhythm — print, cut, fold on the marked tab, and seal. Even your very first cone takes only a few minutes, and batching becomes effortless once you've made two or three.",
   },
   {
     id: "faq-9",
-    question: "Como funciona a garantia de 7 ou 30 dias?",
+    question: "How does the 7-day or 30-day money-back guarantee work?",
     answer:
-      "Se você perceber que o material não atende ao que esperava, pode solicitar o reembolso integral dentro do prazo do plano contratado (7 dias no Essencial ou 30 dias no Premium), sem burocracia.",
+      "Download the templates, run a test print, and see the artwork up close. If it isn't the right fit, request a full refund within 7 days on the Basic Plan or 30 days on the PRO Plan via the official checkout platform or support email.",
   },
   {
     id: "faq-10",
-    question: "Por quanto tempo posso baixar e usar os arquivos?",
+    question: "How long can I keep and reuse the PDF files?",
     answer:
-      "Depois de baixar seus PDFs, você pode salvá-los no computador ou celular e imprimir quantas vezes quiser para este e para os próximos Natais, respeitando os termos de licença.",
+      "Once downloaded to your computer or cloud drive, your templates are yours to reprint for this holiday season and future Christmases under the included personal and handmade physical-craft license.",
   },
 ];

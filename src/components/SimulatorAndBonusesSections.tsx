@@ -4,14 +4,21 @@ import { AlertCircle, Calculator, MessageCircle, BookOpen, TrendingUp } from "lu
 import bonusTagsBoxesImg from "@/assets/bonus-tags-boxes.webp";
 import bonusManualGuideImg from "@/assets/bonus-manual-guide.webp";
 import coneAtelierKitImg from "@/assets/cone-atelier-kit.webp";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { CAMPAIGN_CONFIG, type BonusItem } from "@/config/campaign";
+import {
+  CAMPAIGN_CONFIG,
+  isPlanPriceConfigured,
+  type BonusItem,
+} from "@/config/campaign";
 import {
   SIMULATOR_LIMITS,
+  SIMULATOR_PRESETS,
+  calculateBreakEvenUnits,
   calculateProfitSimulation,
-  formatBRL,
+  formatUSD,
 } from "@/lib/tracking";
 
 function parseFieldNumber(raw: string): number {
@@ -26,7 +33,7 @@ function BonusMockup({ bonus }: { bonus: BonusItem }) {
       <div className="relative overflow-hidden rounded-xl border border-gold/25 bg-pine">
         <img
           src={bonusTagsBoxesImg}
-          alt="Mockup de tags natalinas prontas com cordão dourado"
+          alt="Printable coordinated Christmas gift tags with gold twine"
           width={900}
           height={960}
           loading="lazy"
@@ -42,7 +49,7 @@ function BonusMockup({ bonus }: { bonus: BonusItem }) {
       <div className="relative overflow-hidden rounded-xl border border-gold/25 bg-pine">
         <img
           src={bonusTagsBoxesImg}
-          alt="Mockup de caixinhas natalinas dobráveis em verde pinheiro e vermelho carmim"
+          alt="Foldable evergreen and cranberry Christmas favor boxes"
           width={900}
           height={960}
           loading="lazy"
@@ -58,7 +65,7 @@ function BonusMockup({ bonus }: { bonus: BonusItem }) {
       <div className="relative overflow-hidden rounded-xl border border-gold/25 bg-pine">
         <img
           src={coneAtelierKitImg}
-          alt="Mockup de cartões natalinos dobráveis coordenados"
+          alt="Coordinated printable holiday greeting cards"
           width={900}
           height={960}
           loading="lazy"
@@ -74,7 +81,7 @@ function BonusMockup({ bonus }: { bonus: BonusItem }) {
       <div className="relative overflow-hidden rounded-xl border border-gold/25 bg-pine">
         <img
           src={bonusManualGuideImg}
-          alt="Mockup do manual ilustrado de montagem e dobra de cones natalinos"
+          alt="Illustrated cardstock printing and cone assembly manual"
           width={900}
           height={822}
           loading="lazy"
@@ -89,19 +96,21 @@ function BonusMockup({ bonus }: { bonus: BonusItem }) {
     return (
       <div className="flex aspect-[16/10] flex-col justify-between rounded-xl border border-gold/30 bg-pine p-4 text-cream">
         <div className="flex items-center justify-between text-[11px] tracking-wider text-gold uppercase">
-          <span>Guia Prático PDF</span>
+          <span>Practical PDF Guide</span>
           <TrendingUp className="size-4" aria-hidden="true" />
         </div>
         <div>
-          <p className="font-display text-lg font-semibold text-cream">Natal Lucrativo</p>
+          <p className="font-display text-lg font-semibold text-cream">
+            Seasonal Pricing &amp; Planning
+          </p>
           <p className="mt-1 text-xs text-cream/75">
-            Planilha de insumos • Composição de kits • Agenda de entregas
+            USD supply tracker • Gift bundle pricing • Pre-order schedule
           </p>
         </div>
         <div className="grid grid-cols-3 gap-2 text-[10px] text-cream/85">
-          <span className="rounded bg-pine-surface px-2 py-1 text-center">Custos reais</span>
-          <span className="rounded bg-pine-surface px-2 py-1 text-center">Embalagem</span>
-          <span className="rounded bg-pine-surface px-2 py-1 text-center">Encomendas</span>
+          <span className="rounded bg-pine-surface px-2 py-1 text-center">Real Costs</span>
+          <span className="rounded bg-pine-surface px-2 py-1 text-center">Gift Sets</span>
+          <span className="rounded bg-pine-surface px-2 py-1 text-center">Pre-Orders</span>
         </div>
       </div>
     );
@@ -110,17 +119,17 @@ function BonusMockup({ bonus }: { bonus: BonusItem }) {
   return (
     <div className="flex aspect-[16/10] flex-col justify-between rounded-xl border border-gold/30 bg-pine p-4 text-cream">
       <div className="flex items-center justify-between text-[11px] tracking-wider text-gold uppercase">
-        <span>Mensagens Prontas</span>
+        <span>Editable Scripts</span>
         <MessageCircle className="size-4" aria-hidden="true" />
       </div>
       <div className="space-y-2">
         <div className="max-w-[92%] rounded-xl rounded-tl-none bg-pine-surface px-3 py-2 text-xs leading-snug text-cream/90">
-          “Oi! Estou preparando cones natalinos artesanais recheados sob encomenda para presentes
-          deste ano.”
+          “Hi! I&apos;m crafting handmade Christmas treat cones in small pre-order batches for
+          teacher gifts and holiday tables this month.”
         </div>
-        <div className="ml-auto flex max-w-[78%] items-center gap-1.5 rounded-xl rounded-tr-none bg-crimson/85 px-3 py-1.5 text-[11px] text-cream">
+        <div className="ml-auto flex max-w-[82%] items-center gap-1.5 rounded-xl rounded-tr-none bg-crimson/85 px-3 py-1.5 text-[11px] text-cream">
           <BookOpen className="size-3.5 shrink-0" aria-hidden="true" />
-          Roteiros + catálogo para WhatsApp
+          SMS, WhatsApp &amp; local post scripts
         </div>
       </div>
     </div>
@@ -129,53 +138,90 @@ function BonusMockup({ bonus }: { bonus: BonusItem }) {
 
 export function SimulatorAndBonusesSections() {
   const [qtyText, setQtyText] = useState("40");
-  const [priceText, setPriceText] = useState("18");
-  const [costText, setCostText] = useState("5.5");
+  const [priceText, setPriceText] = useState("8");
+  const [costText, setCostText] = useState("2.5");
+  const [extraCostText, setExtraCostText] = useState("15");
 
   const parsedQty = parseFieldNumber(qtyText);
   const parsedPrice = parseFieldNumber(priceText);
   const parsedCost = parseFieldNumber(costText);
+  const parsedExtraCost = parseFieldNumber(extraCostText);
 
   const hasValidationWarning =
     Number.isNaN(parsedQty) ||
     Number.isNaN(parsedPrice) ||
     Number.isNaN(parsedCost) ||
+    Number.isNaN(parsedExtraCost) ||
     parsedQty < SIMULATOR_LIMITS.minQuantity ||
     parsedQty > SIMULATOR_LIMITS.maxQuantity ||
     parsedPrice < SIMULATOR_LIMITS.minPrice ||
     parsedPrice > SIMULATOR_LIMITS.maxPrice ||
     parsedCost < SIMULATOR_LIMITS.minCost ||
-    parsedCost > SIMULATOR_LIMITS.maxCost;
+    parsedCost > SIMULATOR_LIMITS.maxCost ||
+    parsedExtraCost < SIMULATOR_LIMITS.minExtraBatchCost ||
+    parsedExtraCost > SIMULATOR_LIMITS.maxExtraBatchCost;
 
   const result = calculateProfitSimulation({
     quantity: parsedQty,
     unitPrice: parsedPrice,
     unitCost: parsedCost,
+    extraBatchCost: parsedExtraCost,
   });
+
+  const proPlanPrice = CAMPAIGN_CONFIG.plans.pro.priceUsd;
+  const proBreakEven = isPlanPriceConfigured(proPlanPrice)
+    ? calculateBreakEvenUnits(proPlanPrice + result.extraBatchCost, result.unitMargin)
+    : null;
 
   return (
     <>
-      <section id="simulador" className="bg-cream py-16 sm:py-24">
+      <section id="calculator" className="bg-cream py-16 editorial-paper sm:py-24">
         <div className="mx-auto max-w-6xl px-5 sm:px-8">
           <div data-reveal className="max-w-2xl">
             <h2 className="font-display text-3xl leading-tight font-semibold text-pine sm:text-4xl">
-              Quer transformar seus cones em renda extra artesanal? Simule seu cenário
+              Planning to sell handmade cones locally? Run your own USD numbers
             </h2>
             <p className="mt-3 text-base leading-relaxed text-pine/75">
-              Ajuste quantidade, preço sugerido e custo real de papel, fita e doces na sua cidade
-              para estimar sua margem antes de produzir.
+              Plug in your realistic local supply costs in USD — cardstock, ink, ribbon, treats, and
+              optional batch packaging — to preview your estimated margin before crafting a single
+              order.
             </p>
           </div>
 
           <div
             data-reveal
-            className="mt-10 grid gap-8 rounded-3xl border border-pine/15 bg-card p-6 editorial-shadow sm:p-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]"
+            className="mt-10 grid gap-8 rounded-3xl border border-pine/15 bg-card p-6 editorial-shadow sm:p-8 lg:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)]"
           >
             <div className="space-y-6">
+              <div className="space-y-2">
+                <p className="text-xs font-semibold tracking-wider text-gold-deep uppercase">
+                  Quick editable scenarios (illustrative only)
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {SIMULATOR_PRESETS.map((preset) => (
+                    <Button
+                      key={preset.id}
+                      type="button"
+                      variant="pineOutline"
+                      size="sm"
+                      onClick={() => {
+                        setQtyText(String(preset.quantity));
+                        setPriceText(String(preset.unitPrice));
+                        setCostText(String(preset.unitCost));
+                        setExtraCostText(String(preset.extraBatchCost));
+                      }}
+                      className="rounded-full text-xs"
+                    >
+                      {preset.label} ({preset.quantity})
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
               <div className="space-y-2.5">
                 <div className="flex items-center justify-between gap-4">
                   <Label htmlFor="sim-qty" className="text-sm font-semibold text-pine">
-                    Quantidade de cones
+                    Number of assembled cones
                   </Label>
                   <Input
                     id="sim-qty"
@@ -189,7 +235,7 @@ export function SimulatorAndBonusesSections() {
                   />
                 </div>
                 <Slider
-                  aria-label="Selecionar quantidade de cones"
+                  aria-label="Select number of assembled cones"
                   min={SIMULATOR_LIMITS.minQuantity}
                   max={250}
                   step={5}
@@ -199,15 +245,15 @@ export function SimulatorAndBonusesSections() {
                   }}
                 />
                 <p className="text-xs text-pine/60">
-                  Permitido: {SIMULATOR_LIMITS.minQuantity} a {SIMULATOR_LIMITS.maxQuantity}{" "}
-                  unidades.
+                  Allowed range: {SIMULATOR_LIMITS.minQuantity} to {SIMULATOR_LIMITS.maxQuantity}{" "}
+                  cones.
                 </p>
               </div>
 
               <div className="space-y-2.5">
                 <div className="flex items-center justify-between gap-4">
                   <Label htmlFor="sim-price" className="text-sm font-semibold text-pine">
-                    Preço de venda por unidade (R$)
+                    Selling price per cone (USD $)
                   </Label>
                   <Input
                     id="sim-price"
@@ -222,11 +268,11 @@ export function SimulatorAndBonusesSections() {
                   />
                 </div>
                 <Slider
-                  aria-label="Selecionar preço de venda por unidade"
-                  min={5}
-                  max={60}
-                  step={1}
-                  value={[Math.min(60, Math.max(5, result.unitPrice))]}
+                  aria-label="Select selling price per cone in USD"
+                  min={2}
+                  max={35}
+                  step={0.5}
+                  value={[Math.min(35, Math.max(2, result.unitPrice))]}
                   onValueChange={([v]) => {
                     if (v !== undefined) setPriceText(String(v));
                   }}
@@ -236,13 +282,13 @@ export function SimulatorAndBonusesSections() {
               <div className="space-y-2.5">
                 <div className="flex items-center justify-between gap-4">
                   <Label htmlFor="sim-cost" className="text-sm font-semibold text-pine">
-                    Custo estimado por unidade — papel, fita e doces (R$)
+                    Material cost per cone — cardstock, ink, ribbon &amp; treats (USD $)
                   </Label>
                   <Input
                     id="sim-cost"
                     type="number"
                     inputMode="decimal"
-                    step="0.5"
+                    step="0.25"
                     min={SIMULATOR_LIMITS.minCost}
                     max={SIMULATOR_LIMITS.maxCost}
                     value={costText}
@@ -251,15 +297,37 @@ export function SimulatorAndBonusesSections() {
                   />
                 </div>
                 <Slider
-                  aria-label="Selecionar custo estimado por unidade"
+                  aria-label="Select material cost per cone in USD"
                   min={0}
-                  max={40}
-                  step={0.5}
-                  value={[Math.min(40, result.unitCost)]}
+                  max={20}
+                  step={0.25}
+                  value={[Math.min(20, result.unitCost)]}
                   onValueChange={([v]) => {
                     if (v !== undefined) setCostText(String(v));
                   }}
                 />
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center justify-between gap-4">
+                  <Label htmlFor="sim-extra" className="text-sm font-semibold text-pine">
+                    Extra batch overhead — bags, tape or booth fee (USD $)
+                  </Label>
+                  <Input
+                    id="sim-extra"
+                    type="number"
+                    inputMode="decimal"
+                    step="1"
+                    min={SIMULATOR_LIMITS.minExtraBatchCost}
+                    max={SIMULATOR_LIMITS.maxExtraBatchCost}
+                    value={extraCostText}
+                    onChange={(e) => setExtraCostText(e.target.value)}
+                    className="h-9 w-24 text-right font-semibold"
+                  />
+                </div>
+                <p className="text-xs text-pine/60">
+                  Optional fixed costs for the whole batch ($0 to $5,000 USD).
+                </p>
               </div>
 
               {hasValidationWarning && (
@@ -269,43 +337,52 @@ export function SimulatorAndBonusesSections() {
                 >
                   <AlertCircle className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
                   <span>
-                    Informe valores numéricos válidos dentro dos limites permitidos; o cálculo ao
-                    lado considera os valores ajustados automaticamente.
+                    Enter valid USD numbers within the allowed range; the preview panel automatically
+                    clamps out-of-range values.
                   </span>
                 </p>
               )}
             </div>
 
-            <div className="flex flex-col justify-between rounded-2xl bg-pine p-6 text-cream">
+            <div className="flex flex-col justify-between rounded-2xl border border-gold/25 bg-pine p-6 text-cream gold-halo">
               <div>
                 <div className="flex items-center justify-between border-b border-gold/20 pb-4">
                   <span className="text-xs font-semibold tracking-wider text-gold uppercase">
-                    Estimativa ilustrativa
+                    Illustrative USD Breakdown
                   </span>
                   <Calculator className="size-4 text-gold" aria-hidden="true" />
                 </div>
 
                 <div className="mt-5 grid grid-cols-2 gap-4">
                   <div>
-                    <p className="text-xs text-cream/70">Receita bruta estimada</p>
-                    <p className="mt-1 font-display text-2xl font-semibold text-cream">
-                      {formatBRL(result.grossRevenue)}
+                    <p className="text-xs text-cream/70">Estimated gross sales</p>
+                    <p
+                      data-testid="calc-gross"
+                      className="mt-1 font-display text-2xl font-semibold text-cream"
+                    >
+                      {formatUSD(result.grossRevenue)}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-cream/70">Custo total estimado</p>
-                    <p className="mt-1 font-display text-2xl font-semibold text-cream/90">
-                      {formatBRL(result.totalCost)}
+                    <p className="text-xs text-cream/70">Total costs (materials + overhead)</p>
+                    <p
+                      data-testid="calc-total-cost"
+                      className="mt-1 font-display text-2xl font-semibold text-cream/90"
+                    >
+                      {formatUSD(result.totalCost)}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-cream/70">Margem por unidade</p>
-                    <p className="mt-1 text-lg font-semibold text-gold">
-                      {formatBRL(result.unitMargin)}
+                    <p className="text-xs text-cream/70">Profit per cone</p>
+                    <p
+                      data-testid="calc-unit-margin"
+                      className="mt-1 text-lg font-semibold text-gold"
+                    >
+                      {formatUSD(result.unitMargin)}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-cream/70">Margem percentual</p>
+                    <p className="text-xs text-cream/70">Estimated net margin</p>
                     <p className="mt-1 text-lg font-semibold text-gold">
                       {result.marginPercent.toFixed(1)}%
                     </p>
@@ -314,39 +391,56 @@ export function SimulatorAndBonusesSections() {
 
                 <div className="mt-6 rounded-xl border border-gold/30 bg-pine-surface p-4">
                   <p className="text-xs text-cream/75">
-                    Resultado líquido estimado ({result.quantity} unidades)
+                    Estimated batch net ({result.quantity} cones)
                   </p>
-                  <p className="mt-1 font-display text-3xl font-semibold text-gold">
-                    {formatBRL(result.estimatedNet)}
+                  <p
+                    data-testid="calc-net"
+                    className="mt-1 font-display text-3xl font-semibold text-gold"
+                  >
+                    {formatUSD(result.estimatedNet)}
                   </p>
-                  {result.isUnitLoss && (
+                  {result.breakEvenUnits !== null && result.extraBatchCost > 0 && !result.isUnitLoss && (
+                    <p className="mt-2 text-xs text-cream/80">
+                      Overhead break-even: about{" "}
+                      <strong className="text-gold">{result.breakEvenUnits} cones</strong> to cover{" "}
+                      {formatUSD(result.extraBatchCost)} in extra batch supplies.
+                      {proBreakEven !== null && (
+                        <> ({proBreakEven} cones including the configured PRO plan.)</>
+                      )}
+                    </p>
+                  )}
+                  {(result.isUnitLoss || result.isNetLoss) && (
                     <p className="mt-2 text-xs text-cream/90">
-                      Atenção: o custo informado está maior que o preço de venda por unidade.
+                      Heads up:{" "}
+                      {result.isUnitLoss
+                        ? "your per-cone cost is higher than your selling price."
+                        : "your total batch cost exceeds estimated gross sales at this volume."}
                     </p>
                   )}
                 </div>
               </div>
 
               <p className="mt-5 border-t border-gold/20 pt-4 text-xs leading-relaxed text-cream/70">
-                <strong>Ressalva importante:</strong> esta simulação é apenas uma calculadora
-                ilustrativa baseada nos números que você escolheu. Não existe promessa ou garantia
-                de vendas ou lucro — resultados reais dependem dos custos locais, divulgação,
-                qualidade da montagem e demanda.
+                <strong>Important disclaimer:</strong> This calculator is an illustrative planning
+                tool based solely on the USD figures you enter. There is no guarantee of sales or
+                income — actual results vary with local supply prices, craftsmanship, marketing,
+                and community demand. Commercial sales apply only to physically assembled cones
+                under the included handmade license.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      <section id="bonus" className="bg-cream-warm py-16 sm:py-24">
+      <section id="bonuses" className="bg-cream-warm py-16 sm:py-24">
         <div className="mx-auto max-w-6xl px-5 sm:px-8">
           <div data-reveal className="max-w-2xl">
             <h2 className="font-display text-3xl leading-tight font-semibold text-pine sm:text-4xl">
-              Seis bônus inclusos no Plano Premium
+              Six curated bonuses included in the PRO Plan
             </h2>
             <p className="mt-3 text-base leading-relaxed text-pine/75">
-              Além da biblioteca completa organizada por categorias e do tutorial avançado, o Plano
-              Premium entrega seis materiais complementares para elevar cada entrega.
+              Alongside the theme-organized template library and full finishing tutorial, the PRO
+              Plan includes six coordinated printable and planning resources to elevate every batch.
             </p>
           </div>
 
@@ -359,7 +453,7 @@ export function SimulatorAndBonusesSections() {
               >
                 <BonusMockup bonus={bonus} />
                 <div className="mt-4 flex items-center justify-between text-xs font-semibold tracking-wider text-gold-deep uppercase">
-                  <span>Bônus {bonus.number}</span>
+                  <span>Bonus {bonus.number}</span>
                   <span>{bonus.format}</span>
                 </div>
                 <h3 className="mt-2 font-display text-xl font-semibold text-pine">

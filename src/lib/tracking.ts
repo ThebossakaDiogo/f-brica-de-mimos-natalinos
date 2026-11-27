@@ -1,4 +1,9 @@
-import { CAMPAIGN_CONFIG, isCheckoutConfigured, isPlaceholderValue } from "@/config/campaign";
+import {
+  CAMPAIGN_CONFIG,
+  formatUsd,
+  isCheckoutConfigured,
+  isPlaceholderValue,
+} from "@/config/campaign";
 
 export type ConsentState = "unknown" | "granted" | "denied";
 
@@ -156,75 +161,127 @@ export interface SimulatorInput {
   quantity: number;
   unitPrice: number;
   unitCost: number;
+  extraBatchCost?: number;
 }
 
 export interface SimulatorResult {
   quantity: number;
   unitPrice: number;
   unitCost: number;
+  extraBatchCost: number;
   grossRevenue: number;
+  materialCost: number;
   totalCost: number;
   unitMargin: number;
   estimatedNet: number;
   marginPercent: number;
   isUnitLoss: boolean;
+  isNetLoss: boolean;
+  breakEvenUnits: number | null;
 }
 
 export const SIMULATOR_LIMITS = {
   minQuantity: 1,
-  maxQuantity: 500,
+  maxQuantity: 1000,
   minPrice: 1,
-  maxPrice: 200,
+  maxPrice: 150,
   minCost: 0,
-  maxCost: 150,
+  maxCost: 100,
+  minExtraBatchCost: 0,
+  maxExtraBatchCost: 5000,
 } as const;
+
+export const SIMULATOR_PRESETS = [
+  {
+    id: "neighbors",
+    label: "Small Local Batch",
+    detail: "25 cones • Friends & school",
+    quantity: 25,
+    unitPrice: 7.5,
+    unitCost: 2.25,
+    extraBatchCost: 10,
+  },
+  {
+    id: "craft-fair",
+    label: "Holiday Fair Table",
+    detail: "60 cones • Weekend pop-up",
+    quantity: 60,
+    unitPrice: 8.5,
+    unitCost: 2.5,
+    extraBatchCost: 35,
+  },
+  {
+    id: "office-orders",
+    label: "Office & Gift Sets",
+    detail: "120 cones • Pre-order sets",
+    quantity: 120,
+    unitPrice: 7,
+    unitCost: 2.1,
+    extraBatchCost: 45,
+  },
+] as const;
 
 export function clampNumber(value: number, min: number, max: number, fallback: number): number {
   if (!Number.isFinite(value)) return fallback;
   return Math.min(max, Math.max(min, value));
 }
 
+export function calculateBreakEvenUnits(
+  fixedCostUsd: number,
+  unitMarginUsd: number,
+): number | null {
+  if (!Number.isFinite(fixedCostUsd) || !Number.isFinite(unitMarginUsd)) return null;
+  if (fixedCostUsd <= 0) return 0;
+  if (unitMarginUsd <= 0) return null;
+  return Math.ceil(fixedCostUsd / unitMarginUsd);
+}
+
 export function calculateProfitSimulation(input: SimulatorInput): SimulatorResult {
   const quantity = Math.round(
-    clampNumber(input.quantity, SIMULATOR_LIMITS.minQuantity, SIMULATOR_LIMITS.maxQuantity, 30),
+    clampNumber(input.quantity, SIMULATOR_LIMITS.minQuantity, SIMULATOR_LIMITS.maxQuantity, 40),
   );
   const unitPrice = clampNumber(
     input.unitPrice,
     SIMULATOR_LIMITS.minPrice,
     SIMULATOR_LIMITS.maxPrice,
-    18,
+    8,
   );
   const unitCost = clampNumber(
     input.unitCost,
     SIMULATOR_LIMITS.minCost,
     SIMULATOR_LIMITS.maxCost,
-    5.5,
+    2.5,
+  );
+  const extraBatchCost = clampNumber(
+    input.extraBatchCost ?? 0,
+    SIMULATOR_LIMITS.minExtraBatchCost,
+    SIMULATOR_LIMITS.maxExtraBatchCost,
+    0,
   );
 
   const grossRevenue = quantity * unitPrice;
-  const totalCost = quantity * unitCost;
+  const materialCost = quantity * unitCost;
+  const totalCost = materialCost + extraBatchCost;
   const unitMargin = unitPrice - unitCost;
   const estimatedNet = grossRevenue - totalCost;
   const marginPercent = grossRevenue > 0 ? (estimatedNet / grossRevenue) * 100 : 0;
+  const breakEvenUnits = calculateBreakEvenUnits(extraBatchCost, unitMargin);
 
   return {
     quantity,
     unitPrice,
     unitCost,
+    extraBatchCost,
     grossRevenue,
+    materialCost,
     totalCost,
     unitMargin,
     estimatedNet,
     marginPercent,
     isUnitLoss: unitMargin < 0,
+    isNetLoss: estimatedNet < 0,
+    breakEvenUnits,
   };
 }
 
-export function formatBRL(value: number): string {
-  return new Intl.NumberFormat("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(value);
-}
+export const formatUSD = formatUsd;

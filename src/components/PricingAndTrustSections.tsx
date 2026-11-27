@@ -10,43 +10,45 @@ import { Button } from "@/components/ui/button";
 import {
   CAMPAIGN_CONFIG,
   getDaysUntilChristmas,
-  isPlaceholderValue,
+  getPlanPriceLabel,
+  hasUnsetCommercialConfig,
+  isPlanPriceConfigured,
 } from "@/config/campaign";
 import { BENEFIT_ANCHOR_ITEMS, FAQ_ITEMS } from "@/config/content";
+import { TwinklingLightsOverlay } from "@/components/SnowfallOverlay";
 import type { ConsentState } from "@/lib/tracking";
 
 interface PricingAndTrustProps {
-  onSelectEssential: () => void;
-  onSelectPremium: () => void;
+  onSelectBasic: () => void;
+  onSelectPro: () => void;
   onJumpToPlans: () => void;
   consent: ConsentState;
   onResetConsent: () => void;
 }
 
 export function PricingAndTrustSections({
-  onSelectEssential,
-  onSelectPremium,
+  onSelectBasic,
+  onSelectPro,
   onJumpToPlans,
   consent,
   onResetConsent,
 }: PricingAndTrustProps) {
-  const { essential, premium } = CAMPAIGN_CONFIG.plans;
+  const { basic, pro } = CAMPAIGN_CONFIG.plans;
   const verifiedTestimonials = CAMPAIGN_CONFIG.testimonials;
   const daysUntilChristmas = getDaysUntilChristmas();
+  const showPrelaunchNotice = hasUnsetCommercialConfig();
 
-  const hasLegalPlaceholders =
-    isPlaceholderValue(CAMPAIGN_CONFIG.legal.merchantName) ||
-    isPlaceholderValue(CAMPAIGN_CONFIG.legal.documentId) ||
-    isPlaceholderValue(CAMPAIGN_CONFIG.legal.supportEmail);
+  const basicPriceLabel = getPlanPriceLabel(basic.priceUsd, "USD price pending");
+  const proPriceLabel = getPlanPriceLabel(pro.priceUsd, "USD price pending");
 
   return (
     <>
       {verifiedTestimonials.length > 0 && (
-        <section id="avaliacoes" className="bg-cream py-16 sm:py-24">
+        <section id="reviews" className="bg-cream py-16 sm:py-24">
           <div className="mx-auto max-w-6xl px-5 sm:px-8">
             <div data-reveal className="max-w-2xl">
               <h2 className="font-display text-3xl leading-tight font-semibold text-pine sm:text-4xl">
-                Avaliações reais de quem já montou seus mimos
+                Verified reviews from real makers
               </h2>
             </div>
             <div data-stagger-group className="mt-10 grid gap-6 md:grid-cols-3">
@@ -71,15 +73,15 @@ export function PricingAndTrustSections({
         </section>
       )}
 
-      <section id="comparativo" className="bg-cream py-16 sm:py-24">
+      <section id="comparison" className="bg-cream py-16 editorial-paper sm:py-24">
         <div className="mx-auto max-w-5xl px-5 sm:px-8">
           <div data-reveal className="max-w-2xl">
             <h2 className="font-display text-3xl leading-tight font-semibold text-pine sm:text-4xl">
-              Tudo o que acompanha sua coleção, com total transparência
+              Everything included in each tier, side by side
             </h2>
             <p className="mt-3 text-base text-pine/75">
-              Compare o que entra em cada plano pelos benefícios reais que você recebe — sem
-              valores fictícios riscados.
+              Compare Basic and PRO strictly by the real templates, guides, and guarantees you
+              receive — never inflated crossed-out price anchors.
             </p>
           </div>
 
@@ -88,9 +90,9 @@ export function PricingAndTrustSections({
             className="mt-10 overflow-hidden rounded-2xl border border-pine/15 bg-card editorial-shadow"
           >
             <div className="grid grid-cols-[minmax(0,1fr)_84px_84px] items-center border-b border-pine/15 bg-pine px-4 py-3.5 text-xs font-semibold tracking-wider text-cream uppercase sm:grid-cols-[minmax(0,1fr)_120px_120px] sm:px-6">
-              <span>O que está incluso</span>
-              <span className="text-center">Essencial</span>
-              <span className="text-center text-gold">Premium</span>
+              <span>Included feature</span>
+              <span className="text-center">Basic</span>
+              <span className="text-center text-gold">PRO</span>
             </div>
             <div className="divide-y divide-pine/10">
               {BENEFIT_ANCHOR_ITEMS.map((row) => (
@@ -103,14 +105,14 @@ export function PricingAndTrustSections({
                     <p className="mt-0.5 text-xs text-pine/70">{row.detail}</p>
                   </div>
                   <div className="flex justify-center">
-                    {row.essential ? (
-                      <Check className="size-5 text-pine" aria-label="Incluso no Essencial" />
+                    {row.basic ? (
+                      <Check className="size-5 text-pine" aria-label="Included in Basic" />
                     ) : (
-                      <Minus className="size-4 text-pine/30" aria-label="Não incluso no Essencial" />
+                      <Minus className="size-4 text-pine/30" aria-label="Not included in Basic" />
                     )}
                   </div>
                   <div className="flex justify-center">
-                    <Check className="size-5 text-crimson" aria-label="Incluso no Premium" />
+                    <Check className="size-5 text-crimson" aria-label="Included in PRO" />
                   </div>
                 </div>
               ))}
@@ -119,15 +121,16 @@ export function PricingAndTrustSections({
         </div>
       </section>
 
-      <section id="planos" className="bg-pine py-20 text-cream sm:py-28">
-        <div className="mx-auto max-w-5xl px-5 sm:px-8">
+      <section id="plans" className="relative overflow-hidden bg-pine py-20 text-cream gold-aura sm:py-28">
+        <TwinklingLightsOverlay />
+        <div className="relative z-10 mx-auto max-w-5xl px-5 sm:px-8">
           <div data-reveal className="mx-auto max-w-2xl text-center">
             <h2 className="font-display text-3xl leading-tight font-semibold text-cream sm:text-5xl">
-              Escolha o plano ideal para o seu Natal
+              Choose the workshop edition that fits your holiday plans
             </h2>
             <p className="mt-3 text-base text-cream/80">
-              Pagamento único, acesso digital imediato após confirmação e garantia clara em ambos os
-              planos.
+              One-time USD purchase, instant digital PDF access after checkout confirmation, and a
+              clear money-back guarantee on both tiers.
             </p>
           </div>
 
@@ -137,25 +140,35 @@ export function PricingAndTrustSections({
           >
             <article
               data-stagger-item
-              className="flex flex-col justify-between rounded-3xl border border-gold/25 bg-pine-surface p-7 sm:p-8"
+              className="flex flex-col justify-between rounded-3xl border border-gold/25 bg-pine-surface/95 p-7 sm:p-8"
             >
               <div>
                 <p className="text-xs font-semibold tracking-[0.16em] text-gold uppercase">
-                  Para começar agora
+                  Starter Edition
                 </p>
                 <h3 className="mt-2 font-display text-3xl font-semibold text-cream">
-                  {essential.name}
+                  {basic.name}
                 </h3>
-                <div className="mt-5 flex items-baseline gap-2">
-                  <span className="font-display text-5xl font-semibold text-cream">
-                    {essential.priceFormatted}
+                <div className="mt-5 flex flex-wrap items-baseline gap-2">
+                  <span
+                    className={
+                      isPlanPriceConfigured(basic.priceUsd)
+                        ? "font-display text-5xl font-semibold text-cream"
+                        : "font-display text-2xl font-semibold text-gold"
+                    }
+                  >
+                    {basicPriceLabel}
                   </span>
-                  <span className="text-xs text-cream/70">pagamento único</span>
+                  <span className="text-xs text-cream/70">
+                    {isPlanPriceConfigured(basic.priceUsd)
+                      ? "USD • one-time payment"
+                      : "set confirmed USD in config"}
+                  </span>
                 </div>
-                <p className="mt-2 text-xs text-gold">{essential.accessLabel}</p>
+                <p className="mt-2 text-xs text-gold">{basic.accessLabel}</p>
 
                 <ul className="mt-7 space-y-3 border-t border-gold/20 pt-6 text-sm text-cream/85">
-                  {essential.features.map((feature) => (
+                  {basic.features.map((feature) => (
                     <li key={feature} className="flex items-start gap-2.5">
                       <Check className="mt-0.5 size-4 shrink-0 text-gold" aria-hidden="true" />
                       <span>{feature}</span>
@@ -169,40 +182,52 @@ export function PricingAndTrustSections({
                   type="button"
                   variant="creamOutline"
                   size="xl"
-                  onClick={onSelectEssential}
+                  onClick={onSelectBasic}
                   className="w-full"
                 >
-                  Escolher Plano Essencial ({essential.priceFormatted})
+                  {isPlanPriceConfigured(basic.priceUsd)
+                    ? `Choose Basic Plan (${basicPriceLabel})`
+                    : "Choose Basic Plan"}
                 </Button>
               </div>
             </article>
 
             <article
               data-stagger-item
-              className="relative flex flex-col justify-between rounded-3xl border-2 border-gold bg-cream p-7 text-pine editorial-shadow sm:p-8"
+              className="relative flex flex-col justify-between rounded-3xl border-2 border-gold bg-cream p-7 text-pine gold-halo sm:p-8"
             >
               <div>
                 <div className="flex items-center justify-between gap-2">
                   <p className="text-xs font-semibold tracking-[0.16em] text-crimson uppercase">
-                    Coleção completa + 6 bônus
+                    Full Library + 6 Bonuses
                   </p>
                   <span className="rounded-full bg-pine px-3 py-1 text-[11px] font-semibold text-gold">
-                    Mais completo
+                    Most Complete
                   </span>
                 </div>
                 <h3 className="mt-2 font-display text-3xl font-semibold text-pine">
-                  {premium.name}
+                  {pro.name}
                 </h3>
-                <div className="mt-5 flex items-baseline gap-2">
-                  <span className="font-display text-5xl font-semibold text-pine">
-                    {premium.priceFormatted}
+                <div className="mt-5 flex flex-wrap items-baseline gap-2">
+                  <span
+                    className={
+                      isPlanPriceConfigured(pro.priceUsd)
+                        ? "font-display text-5xl font-semibold text-pine"
+                        : "font-display text-2xl font-semibold text-crimson"
+                    }
+                  >
+                    {proPriceLabel}
                   </span>
-                  <span className="text-xs text-pine/65">pagamento único</span>
+                  <span className="text-xs text-pine/65">
+                    {isPlanPriceConfigured(pro.priceUsd)
+                      ? "USD • one-time payment"
+                      : "set confirmed USD in config"}
+                  </span>
                 </div>
-                <p className="mt-2 text-xs font-medium text-crimson">{premium.accessLabel}</p>
+                <p className="mt-2 text-xs font-medium text-crimson">{pro.accessLabel}</p>
 
                 <ul className="mt-7 space-y-3 border-t border-pine/15 pt-6 text-sm text-pine/90">
-                  {premium.features.map((feature) => (
+                  {pro.features.map((feature) => (
                     <li key={feature} className="flex items-start gap-2.5">
                       <Check className="mt-0.5 size-4 shrink-0 text-crimson" aria-hidden="true" />
                       <span>{feature}</span>
@@ -216,10 +241,12 @@ export function PricingAndTrustSections({
                   type="button"
                   variant="crimson"
                   size="xl"
-                  onClick={onSelectPremium}
+                  onClick={onSelectPro}
                   className="w-full"
                 >
-                  Quero o Plano Premium ({premium.priceFormatted})
+                  {isPlanPriceConfigured(pro.priceUsd)
+                    ? `Get the PRO Plan (${proPriceLabel})`
+                    : "Get the PRO Plan"}
                   <ArrowRight className="size-4" />
                 </Button>
               </div>
@@ -228,7 +255,7 @@ export function PricingAndTrustSections({
         </div>
       </section>
 
-      <section id="garantia" className="bg-cream-warm py-16 sm:py-20">
+      <section id="guarantee" className="bg-cream-warm py-16 sm:py-20">
         <div className="mx-auto max-w-4xl px-5 sm:px-8">
           <div
             data-reveal
@@ -239,11 +266,11 @@ export function PricingAndTrustSections({
             </div>
             <div>
               <h2 className="font-display text-2xl font-semibold text-pine sm:text-3xl">
-                Garantia clara de {CAMPAIGN_CONFIG.guarantees.essentialDays} dias no Essencial e{" "}
-                {CAMPAIGN_CONFIG.guarantees.premiumDays} dias no Premium
+                Clear {CAMPAIGN_CONFIG.guarantees.basicDays}-day guarantee on Basic &amp;{" "}
+                {CAMPAIGN_CONFIG.guarantees.proDays}-day guarantee on PRO
               </h2>
               <p className="mt-2.5 text-sm leading-relaxed text-pine/80">
-                Baixe os moldes, teste a impressão e avalie a qualidade das artes com calma.{" "}
+                Download the PDFs, print a test sheet, and inspect the artwork at your own pace.{" "}
                 {CAMPAIGN_CONFIG.guarantees.note}
               </p>
             </div>
@@ -255,10 +282,11 @@ export function PricingAndTrustSections({
         <div className="mx-auto max-w-3xl px-5 sm:px-8">
           <div data-reveal className="text-center">
             <h2 className="font-display text-3xl leading-tight font-semibold text-pine sm:text-4xl">
-              Perguntas frequentes
+              Frequently asked questions
             </h2>
             <p className="mt-2.5 text-base text-pine/75">
-              Respostas diretas sobre impressão, papel, entrega digital, licença e garantia.
+              Straightforward answers about cardstock, US Letter &amp; A4 printing, digital
+              delivery, handmade licensing, and guarantees.
             </p>
           </div>
 
@@ -277,28 +305,29 @@ export function PricingAndTrustSections({
         </div>
       </section>
 
-      <section className="relative overflow-hidden bg-pine py-20 text-cream sm:py-28">
-        <div className="mx-auto max-w-3xl px-5 text-center sm:px-8">
+      <section className="relative overflow-hidden bg-pine py-20 text-cream gold-aura sm:py-28">
+        <TwinklingLightsOverlay />
+        <div className="relative z-10 mx-auto max-w-3xl px-5 text-center sm:px-8">
           <div data-reveal className="space-y-6">
             <p className="inline-flex items-center justify-center gap-2 text-xs font-semibold tracking-wider text-gold uppercase">
               <Calendar className="size-4" aria-hidden="true" />
               <span>
-                Natal em {CAMPAIGN_CONFIG.campaignDate.displayLabel}
+                Christmas on {CAMPAIGN_CONFIG.campaignDate.displayLabel}
                 {daysUntilChristmas !== null && daysUntilChristmas > 0
-                  ? ` • faltam ${daysUntilChristmas} dias`
+                  ? ` • ${daysUntilChristmas} days away`
                   : ""}
               </span>
             </p>
             <h2 className="font-display text-3xl leading-tight font-semibold text-cream sm:text-5xl">
-              Daqui a alguns dias, será Natal. O que você vai criar até lá?
+              Christmas is right around the corner. What will you craft before then?
             </h2>
             <p className="mx-auto max-w-xl text-base leading-relaxed text-cream/80">
-              Garanta acesso imediato aos +500 moldes e comece hoje mesmo a montar lembranças com
-              acabamento de loja usando uma folha de papel.
+              Unlock instant access to 500+ printable templates and start turning simple cardstock
+              into boutique-ready holiday keepsakes tonight.
             </p>
             <div className="pt-2">
               <Button type="button" variant="crimson" size="xl" onClick={onJumpToPlans}>
-                QUERO MEUS +500 MOLDES
+                GET MY 500+ TEMPLATES
                 <ArrowRight className="size-4" />
               </Button>
             </div>
@@ -313,22 +342,25 @@ export function PricingAndTrustSections({
               <p className="font-display text-base font-semibold text-cream">
                 {CAMPAIGN_CONFIG.brandName}
               </p>
-              <p>Produto 100% digital em PDF. Doces, fitas e objetos decorativos não acompanham.</p>
+              <p>
+                100% digital PDF product (US Letter &amp; A4). Physical candies, ribbons, and
+                decorative props are not included.
+              </p>
             </div>
 
             <div className="space-y-2">
-              <p className="font-semibold text-gold">Licença de uso</p>
+              <p className="font-semibold text-gold">Handmade Craft License</p>
               <p>{CAMPAIGN_CONFIG.license.summary}</p>
             </div>
 
             <div className="space-y-2">
-              <p className="font-semibold text-gold">Dados legais e privacidade</p>
+              <p className="font-semibold text-gold">Legal &amp; Privacy</p>
               <p className="[overflow-wrap:anywhere]">
-                Responsável: {CAMPAIGN_CONFIG.legal.merchantName}
+                Seller: {CAMPAIGN_CONFIG.legal.merchantName}
                 <br />
-                Documento: {CAMPAIGN_CONFIG.legal.documentId}
+                Registration / Tax ID: {CAMPAIGN_CONFIG.legal.documentId}
                 <br />
-                Suporte: {CAMPAIGN_CONFIG.legal.supportEmail}
+                Support: {CAMPAIGN_CONFIG.legal.supportEmail}
               </p>
               <button
                 type="button"
@@ -336,20 +368,20 @@ export function PricingAndTrustSections({
                 className="inline-flex cursor-pointer items-center gap-1.5 text-gold underline underline-offset-4 hover:text-cream"
               >
                 <Cookie className="size-3.5" aria-hidden="true" />
-                Preferências de cookies e Meta Pixel (
+                Cookie &amp; Meta Pixel preferences (
                 {consent === "granted"
-                  ? "aceito"
+                  ? "accepted"
                   : consent === "denied"
-                    ? "recusado"
-                    : "não definido"}
+                    ? "declined"
+                    : "not set"}
                 )
               </button>
             </div>
           </div>
 
-          {hasLegalPlaceholders && (
+          {showPrelaunchNotice && (
             <div className="rounded-xl border border-gold/30 bg-pine-surface px-4 py-3 text-cream/85">
-              <strong className="text-gold">Aviso pré-publicação:</strong>{" "}
+              <strong className="text-gold">Pre-launch configuration notice:</strong>{" "}
               {CAMPAIGN_CONFIG.legal.commercialNotice}
             </div>
           )}

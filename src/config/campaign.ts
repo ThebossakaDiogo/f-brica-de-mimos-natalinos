@@ -1,10 +1,13 @@
-export type PlanKey = "essential" | "premium" | "essentialUpgrade";
+export type PlanKey = "basic" | "pro" | "basicUpgrade";
 
 export interface PlanConfig {
   key: PlanKey;
   name: string;
-  price: number;
-  priceFormatted: string;
+  /**
+   * Confirmed USD price for this plan, or null when still unset.
+   * Never invent prices: replace null with your confirmed USD figure before launch.
+   */
+  priceUsd: number | null;
   guaranteeDays: number;
   checkoutUrl: string;
   accessLabel: string;
@@ -30,61 +33,60 @@ export interface BonusItem {
 }
 
 export const CAMPAIGN_CONFIG = {
-  brandName: "Fábrica de Mimos Natalinos",
-  editionLabel: "Edição Especial de Natal",
-  /** Data real do Natal desta campanha (sem contador regressivo artificial). */
+  brandName: "Christmas Treat Workshop",
+  editionLabel: "Holiday Craft Edition",
+  currency: "USD" as const,
+  /** Real Christmas date for this campaign (never a fake countdown timer). */
   campaignDate: {
     christmasIso: "2026-12-25",
-    displayLabel: "25 de dezembro de 2026",
+    displayLabel: "December 25, 2026",
   },
   /**
-   * Placeholders explícitos de checkout.
-   * Substitua pelas URLs reais do seu gateway de pagamento antes de publicar.
+   * Explicit configurable commercial values and checkout placeholders.
+   * Set confirmed USD prices (number) and live payment URLs before publishing.
    */
   plans: {
-    essential: {
-      key: "essential",
-      name: "Plano Essencial",
-      price: 10,
-      priceFormatted: "R$ 10,00",
+    basic: {
+      key: "basic",
+      name: "Basic Plan",
+      priceUsd: null as number | null,
       guaranteeDays: 7,
-      checkoutUrl: "CONFIGURE_CHECKOUT_URL_ESSENCIAL",
-      accessLabel: "Acesso imediato após confirmação",
+      checkoutUrl: "CONFIGURE_CHECKOUT_URL_BASIC",
+      accessLabel: "Instant digital PDF delivery after payment",
       features: [
-        "+500 moldes natalinos de cones de papel prontos para imprimir",
-        "Tutorial básico de impressão, recorte e montagem",
-        "Acesso imediato em PDF de alta resolução",
-        "Garantia incondicional de 7 dias",
+        "500+ printable Christmas paper cone templates ready to download",
+        "Basic printing, cutting, and folding starter guide",
+        "High-resolution PDF files formatted for US Letter & A4",
+        "Personal use & handmade finished-goods license (assembled cones only)",
+        "7-day money-back guarantee",
       ],
     },
-    premium: {
-      key: "premium",
-      name: "Plano Premium",
-      price: 27.9,
-      priceFormatted: "R$ 27,90",
+    pro: {
+      key: "pro",
+      name: "PRO Plan",
+      priceUsd: null as number | null,
       guaranteeDays: 30,
-      checkoutUrl: "CONFIGURE_CHECKOUT_URL_PREMIUM",
-      accessLabel: "Acesso imediato à coleção completa",
+      checkoutUrl: "CONFIGURE_CHECKOUT_URL_PRO",
+      accessLabel: "Instant full library & all 6 bonuses",
       features: [
-        "Tudo do Plano Essencial (+500 moldes natalinos)",
-        "Biblioteca organizada por categorias e estilos",
-        "Tutorial completo com acabamento de loja e escolha de papéis",
-        "Todos os 6 bônus exclusivos com moldes e materiais extras",
-        "Garantia estendida de 30 dias",
+        "Everything in the Basic Plan (500+ printable Christmas templates)",
+        "Theme-organized library by holiday style, color palette, and audience",
+        "Complete boutique-finish tutorial on cardstock weights, crisp folds, and ribbons",
+        "All 6 curated bonuses (gift tags, favor boxes, cards, assembly manual, pricing guide & outreach kit)",
+        "30-day extended money-back guarantee",
       ],
     },
-    essentialUpgrade: {
-      key: "essentialUpgrade",
-      name: "Upgrade para o Plano Premium",
-      price: 20,
-      priceFormatted: "R$ 20,00",
+    basicUpgrade: {
+      key: "basicUpgrade",
+      name: "PRO Plan Upgrade Offer",
+      priceUsd: null as number | null,
       guaranteeDays: 30,
-      checkoutUrl: "CONFIGURE_CHECKOUT_URL_UPGRADE_PREMIUM",
-      accessLabel: "Condição de upgrade no clique do Essencial",
+      checkoutUrl: "CONFIGURE_CHECKOUT_URL_UPGRADE_PRO",
+      accessLabel: "Special upgrade option when selecting Basic",
       features: [
-        "Tudo do Plano Premium completo por R$ 20,00 no total",
-        "Biblioteca por categorias + tutorial completo + 6 bônus",
-        "Garantia estendida de 30 dias",
+        "Full PRO Plan library organized by holiday theme and style",
+        "Complete boutique-finish tutorial + all 6 printable & planning bonuses",
+        "30-day extended money-back guarantee",
       ],
     },
   } satisfies Record<PlanKey, PlanConfig>,
@@ -92,97 +94,137 @@ export const CAMPAIGN_CONFIG = {
     {
       id: "tags",
       number: "01",
-      title: "Tags Natalinas Prontas",
-      subtitle: "Etiquetas coordenadas De / Para",
+      title: "Coordinated Gift Tags",
+      subtitle: "Printable To / From heirloom tags",
       description:
-        "Folhas prontas com etiquetas natalinas coordenadas aos cones para assinar cada mimo com cuidado.",
-      format: "PDF A4 • Prontas para recorte",
+        "Ready-to-cut sheets of matching holiday gift tags so every cone looks personalized for family, teachers, or local buyers.",
+      format: "US Letter & A4 PDF",
       mockupKind: "tags",
     },
     {
       id: "boxes",
       number: "02",
-      title: "Caixinhas Natalinas",
-      subtitle: "Moldes extras para bombons e biscoitos",
+      title: "Holiday Favor Boxes",
+      subtitle: "Compact fold-and-fill box templates",
       description:
-        "Modelos dobráveis compactos para compor kits com trufas, pães de mel ou lembranças corporativas.",
-      format: "PDF A4 • Vincos marcados",
+        "Extra foldable treat boxes sized for truffles, shortbread cookies, fudge, or multi-piece holiday gift bundles.",
+      format: "PDF • Score lines marked",
       mockupKind: "boxes",
     },
     {
       id: "cards",
       number: "03",
-      title: "Cartões de Natal",
-      subtitle: "Papelaria editorial para acompanhar o presente",
+      title: "Editorial Greeting Cards",
+      subtitle: "Foldable stationery to pair with every cone",
       description:
-        "Cartões dobráveis com ilustrações festivas e espaço interno limpo para mensagens manuscritas.",
-      format: "PDF A4 • Frente e verso",
+        "Classic holiday note cards featuring festive artwork and clean interior space for handwritten seasonal notes.",
+      format: "PDF • Front & inside",
       mockupKind: "cards",
     },
     {
       id: "manual",
       number: "04",
-      title: "Manual de Montagem",
-      subtitle: "Guia ilustrado de papel, impressão e dobra",
+      title: "Craft & Assembly Manual",
+      subtitle: "Illustrated cardstock, ink, and finishing guide",
       description:
-        "Orientações práticas sobre gramaturas recomendadas, corte preciso, tipos de cola e laços firmes.",
-      format: "Guia digital ilustrado",
+        "Step-by-step advice on choosing 65–90 lb (180–240 gsm) cardstock, crisp scoring, clean glue seams, and ribbon knots.",
+      format: "Illustrated digital guide",
       mockupKind: "manual",
     },
     {
       id: "guide",
       number: "05",
-      title: "Guia Natal Lucrativo",
-      subtitle: "Organização de custos, kits e precificação",
+      title: "Seasonal Pricing & Planning Guide",
+      subtitle: "Costing sheets, gift bundles & batch prep",
       description:
-        "Passo a passo realista para calcular insumos, estruturar encomendas e organizar a produção artesanal.",
-      format: "Material prático em PDF",
+        "A grounded workbook for tracking real supply costs, structuring 4-pack or 12-pack gift sets, and scheduling holiday pre-orders.",
+      format: "Practical PDF workbook",
       mockupKind: "guide",
     },
     {
       id: "whatsapp",
       number: "06",
-      title: "Kit Divulgação WhatsApp",
-      subtitle: "Textos editáveis e roteiro de apresentação",
+      title: "Local Outreach & Showcase Kit",
+      subtitle: "Editable scripts for messages & holiday posts",
       description:
-        "Modelos de mensagens discretas e vitrines para apresentar seus mimos prontos a amigos, escola e clientes.",
-      format: "Modelos prontos para copiar",
+        "Polite, copy-and-customize announcement templates to share your finished handmade cones with neighbors, parents, coworkers, and craft groups.",
+      format: "Ready-to-edit templates",
       mockupKind: "whatsapp",
     },
   ] satisfies readonly BonusItem[],
   /**
-   * Avaliações reais verificadas.
-   * Mantido vazio por padrão: a seção permanece oculta até você preencher depoimentos reais.
+   * Genuine verified customer reviews.
+   * Intentionally empty by default: the reviews section stays hidden until real reviews are entered here.
    */
   testimonials: [] as readonly VerifiedTestimonial[],
   license: {
     summary:
-      "Uso pessoal e venda artesanal das peças físicas montadas por você. É proibida a revenda, doação ou redistribuição dos arquivos digitais/moldes em PDF.",
+      "Includes personal crafting use and small-batch handmade commercial sales of finished, physically assembled cones you make yourself. Reselling, sharing, gifting, or redistributing the digital PDF files or raw templates is strictly prohibited.",
   },
   guarantees: {
-    essentialDays: 7,
-    premiumDays: 30,
-    note: "Solicite o reembolso integral dentro do prazo do plano escolhido pelos canais oficiais da plataforma de pagamento ou suporte abaixo.",
+    basicDays: 7,
+    proDays: 30,
+    note: "Request a full refund within your chosen plan's guarantee window through the official checkout platform or our support contact below.",
   },
   analytics: {
-    /** Substitua pelo ID numérico do seu Meta Pixel antes de publicar. */
+    /** Replace with your numeric Meta Pixel ID before publishing. */
     metaPixelId: "CONFIGURE_META_PIXEL_ID",
     consentStorageKey: "fmn_analytics_consent_v1",
   },
   legal: {
-    /** Placeholders explícitos: confirme e substitua antes de publicar. */
-    merchantName: "CONFIGURE_RAZAO_SOCIAL_OU_NOME_RESPONSAVEL",
-    documentId: "CONFIGURE_CNPJ_OU_CPF",
-    supportEmail: "CONFIGURE_EMAIL_DE_SUPORTE",
-    privacyPolicyUrl: "CONFIGURE_URL_POLITICA_DE_PRIVACIDADE",
-    termsUrl: "CONFIGURE_URL_TERMOS_DE_USO",
+    /** Explicit pre-launch placeholders: confirm and replace before publishing. */
+    merchantName: "CONFIGURE_BUSINESS_OR_SELLER_NAME",
+    documentId: "CONFIGURE_TAX_ID_OR_REGISTRATION",
+    supportEmail: "CONFIGURE_SUPPORT_EMAIL",
+    privacyPolicyUrl: "CONFIGURE_PRIVACY_POLICY_URL",
+    termsUrl: "CONFIGURE_TERMS_OF_USE_URL",
     commercialNotice:
-      "Antes de publicar, substitua os placeholders de checkout, dados legais, Pixel e revise preços, garantias e licença em src/config/campaign.ts.",
+      "Before publishing, configure confirmed USD prices, live checkout URLs, legal business details, and Meta Pixel ID in src/config/campaign.ts.",
   },
 } as const;
 
 export function isPlaceholderValue(value: string): boolean {
   return value.trim() === "" || value.startsWith("CONFIGURE_");
+}
+
+export function isPlanPriceConfigured(priceUsd: number | null): priceUsd is number {
+  return typeof priceUsd === "number" && Number.isFinite(priceUsd) && priceUsd > 0;
+}
+
+export function formatUsd(value: number): string {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value);
+}
+
+export function getPlanPriceLabel(priceUsd: number | null, fallback = "USD price configurable"): string {
+  if (!isPlanPriceConfigured(priceUsd)) return fallback;
+  return formatUsd(priceUsd);
+}
+
+export function getUpgradePriceDifferenceUsd(
+  basicPriceUsd: number | null,
+  upgradeTotalUsd: number | null,
+): number | null {
+  if (!isPlanPriceConfigured(basicPriceUsd) || !isPlanPriceConfigured(upgradeTotalUsd)) {
+    return null;
+  }
+  const diff = Math.round((upgradeTotalUsd - basicPriceUsd) * 100) / 100;
+  return diff >= 0 ? diff : null;
+}
+
+export function getUpgradeSavingsVsProUsd(
+  proPriceUsd: number | null,
+  upgradeTotalUsd: number | null,
+): number | null {
+  if (!isPlanPriceConfigured(proPriceUsd) || !isPlanPriceConfigured(upgradeTotalUsd)) {
+    return null;
+  }
+  const savings = Math.round((proPriceUsd - upgradeTotalUsd) * 100) / 100;
+  return savings > 0 ? savings : null;
 }
 
 export function isCheckoutConfigured(url: string): boolean {
@@ -193,6 +235,22 @@ export function isCheckoutConfigured(url: string): boolean {
   } catch {
     return false;
   }
+}
+
+export function hasUnsetCommercialConfig(): boolean {
+  const { plans, legal, analytics } = CAMPAIGN_CONFIG;
+  return (
+    !isPlanPriceConfigured(plans.basic.priceUsd) ||
+    !isPlanPriceConfigured(plans.pro.priceUsd) ||
+    !isPlanPriceConfigured(plans.basicUpgrade.priceUsd) ||
+    !isCheckoutConfigured(plans.basic.checkoutUrl) ||
+    !isCheckoutConfigured(plans.pro.checkoutUrl) ||
+    !isCheckoutConfigured(plans.basicUpgrade.checkoutUrl) ||
+    isPlaceholderValue(analytics.metaPixelId) ||
+    isPlaceholderValue(legal.merchantName) ||
+    isPlaceholderValue(legal.documentId) ||
+    isPlaceholderValue(legal.supportEmail)
+  );
 }
 
 export function getDaysUntilChristmas(referenceDate: Date = new Date()): number | null {

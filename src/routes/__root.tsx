@@ -78,17 +78,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Fábrica de Mimos Natalinos — +500 Moldes de Cones Natalinos" },
+      { title: "Christmas Treat Workshop — 500+ Printable Christmas Cone Templates" },
       {
         name: "description",
         content:
-          "Transforme papel em presentes encantadores com mais de 500 moldes natalinos prontos para imprimir, recortar e montar.",
+          "Turn a single sheet of cardstock into boutique-style Christmas treat cones with 500+ printable PDF templates ready to print, cut, assemble, gift, or sell locally.",
       },
-      { property: "og:title", content: "Fábrica de Mimos Natalinos" },
+      { property: "og:title", content: "Christmas Treat Workshop — 500+ Printable Cone Templates" },
       {
         property: "og:description",
         content:
-          "Mais de 500 moldes de cones natalinos de papel prontos para imprimir, recortar e montar. A partir de R$ 10.",
+          "Craft heirloom-feel holiday paper treat cones at home with 500+ printable templates in US Letter & A4 PDF formats.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -119,7 +119,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="pt-BR">
+    <html lang="en-US">
       <head>
         <HeadContent />
       </head>

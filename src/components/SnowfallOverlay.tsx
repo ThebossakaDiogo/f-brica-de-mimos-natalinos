@@ -105,3 +105,34 @@ export function SnowfallOverlay() {
     />
   );
 }
+
+const TWINKLE_SPOTS = [
+  { top: "11%", left: "14%", size: "size-1.5", delay: "0s", duration: "4.6s" },
+  { top: "22%", left: "44%", size: "size-1", delay: "1.4s", duration: "5.2s" },
+  { top: "16%", left: "82%", size: "size-1.5", delay: "0.8s", duration: "4.1s" },
+  { top: "48%", left: "9%", size: "size-1", delay: "2.1s", duration: "5.5s" },
+  { top: "62%", left: "91%", size: "size-1.5", delay: "1.7s", duration: "4.8s" },
+  { top: "79%", left: "26%", size: "size-1", delay: "0.5s", duration: "5.0s" },
+  { top: "74%", left: "66%", size: "size-1.5", delay: "2.6s", duration: "4.4s" },
+] as const;
+
+export function TwinklingLightsOverlay() {
+  return (
+    <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+      {TWINKLE_SPOTS.map((spot, idx) => (
+        <span
+          key={idx}
+          className={`twinkle-light absolute rounded-full bg-gold/90 ${spot.size}`}
+          style={
+            {
+              top: spot.top,
+              left: spot.left,
+              "--twinkle-delay": spot.delay,
+              "--twinkle-duration": spot.duration,
+            } as React.CSSProperties
+          }
+        />
+      ))}
+    </div>
+  );
+}

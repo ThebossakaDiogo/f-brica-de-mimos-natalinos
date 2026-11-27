@@ -9,13 +9,14 @@ import { SimulatorAndBonusesSections } from "@/components/SimulatorAndBonusesSec
 import { PricingAndTrustSections } from "@/components/PricingAndTrustSections";
 import {
   AnalyticsConsentBanner,
+  BasicUpgradeModal,
   CheckoutPlaceholderModal,
-  EssentialUpgradeModal,
   StickyMobileCta,
 } from "@/components/OfferModals";
 import {
   CAMPAIGN_CONFIG,
   isCheckoutConfigured,
+  isPlanPriceConfigured,
   type PlanConfig,
 } from "@/config/campaign";
 import {
@@ -32,29 +33,29 @@ import {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Fábrica de Mimos Natalinos — +500 Moldes de Cones Natalinos em PDF" },
+      { title: "Christmas Treat Workshop — 500+ Printable Christmas Cone Templates (PDF)" },
       {
         name: "description",
         content:
-          "Transforme uma simples folha de papel em cones natalinos encantadores com mais de 500 moldes prontos para imprimir, recortar e montar. A partir de R$ 10.",
+          "Turn a single sheet of cardstock into boutique-style Christmas treat cones with 500+ printable US Letter & A4 PDF templates for gifting or local handmade sales.",
       },
       {
         property: "og:title",
-        content: "Fábrica de Mimos Natalinos — +500 Moldes Natalinos",
+        content: "Christmas Treat Workshop — 500+ Printable Christmas Templates",
       },
       {
         property: "og:description",
         content:
-          "Transforme papel em presentes encantadores com mais de 500 moldes natalinos prontos para imprimir, recortar e montar.",
+          "Craft boutique-style holiday paper treat cones at home with 500+ printable templates ready to print, cut, and assemble.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: FabricaDeMimosLanding,
+  component: ChristmasTreatWorkshopLanding,
 });
 
-function FabricaDeMimosLanding() {
+function ChristmasTreatWorkshopLanding() {
   const rootRef = useRef<HTMLDivElement | null>(null);
   const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
   const [pendingPlaceholderPlan, setPendingPlaceholderPlan] = useState<PlanConfig | null>(null);
@@ -73,7 +74,7 @@ function FabricaDeMimosLanding() {
 
   useEffect(() => {
     const onScroll = () => {
-      const plansEl = document.getElementById("planos");
+      const plansEl = document.getElementById("plans");
       const passedHero = window.scrollY > 520;
       const nearPlans = plansEl
         ? plansEl.getBoundingClientRect().top < window.innerHeight * 0.85 &&
@@ -91,66 +92,77 @@ function FabricaDeMimosLanding() {
     const root = rootRef.current;
     if (!root) return;
 
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (prefersReducedMotion) return;
-
     gsap.registerPlugin(ScrollTrigger);
 
-    const ctx = gsap.context(() => {
-      gsap.utils.toArray<HTMLElement>("[data-reveal]").forEach((el) => {
-        gsap.from(el, {
-          y: 26,
-          opacity: 0,
-          duration: 0.72,
-          ease: "power2.out",
-          clearProps: "transform,opacity",
-          scrollTrigger: {
-            trigger: el,
-            start: "top 86%",
-            once: true,
-          },
-        });
-      });
+    const mm = gsap.matchMedia(root);
 
-      gsap.utils.toArray<HTMLElement>("[data-stagger-group]").forEach((group) => {
-        const items = group.querySelectorAll<HTMLElement>("[data-stagger-item]");
-        if (items.length === 0) return;
-        gsap.from(items, {
-          y: 22,
-          opacity: 0,
-          duration: 0.62,
-          stagger: 0.1,
-          ease: "power2.out",
-          clearProps: "transform,opacity",
-          scrollTrigger: {
-            trigger: group,
-            start: "top 85%",
-            once: true,
-          },
-        });
-      });
+    mm.add(
+      {
+        isDesktop: "(min-width: 768px)",
+        reduceMotion: "(prefers-reduced-motion: reduce)",
+      },
+      (context) => {
+        if (context.conditions?.["reduceMotion"]) return;
 
-      gsap.utils.toArray<HTMLElement>("[data-parallax]").forEach((el) => {
-        gsap.to(el, {
-          yPercent: -6,
-          ease: "none",
-          scrollTrigger: {
-            trigger: el,
-            start: "top bottom",
-            end: "bottom top",
-            scrub: true,
-          },
+        const isDesktop = Boolean(context.conditions?.["isDesktop"]);
+
+        gsap.utils.toArray<HTMLElement>("[data-reveal]").forEach((el) => {
+          gsap.from(el, {
+            y: isDesktop ? 26 : 16,
+            opacity: 0,
+            duration: isDesktop ? 0.72 : 0.52,
+            ease: "power2.out",
+            clearProps: "transform,opacity",
+            scrollTrigger: {
+              trigger: el,
+              start: "top 88%",
+              once: true,
+            },
+          });
         });
-      });
-    }, root);
+
+        gsap.utils.toArray<HTMLElement>("[data-stagger-group]").forEach((group) => {
+          const items = group.querySelectorAll<HTMLElement>("[data-stagger-item]");
+          if (items.length === 0) return;
+          gsap.from(items, {
+            y: isDesktop ? 22 : 14,
+            opacity: 0,
+            duration: isDesktop ? 0.62 : 0.48,
+            stagger: isDesktop ? 0.1 : 0.06,
+            ease: "power2.out",
+            clearProps: "transform,opacity",
+            scrollTrigger: {
+              trigger: group,
+              start: "top 86%",
+              once: true,
+            },
+          });
+        });
+
+        if (isDesktop) {
+          gsap.utils.toArray<HTMLElement>("[data-parallax]").forEach((el) => {
+            gsap.to(el, {
+              yPercent: -6,
+              ease: "none",
+              scrollTrigger: {
+                trigger: el,
+                start: "top bottom",
+                end: "bottom top",
+                scrub: true,
+              },
+            });
+          });
+        }
+      },
+    );
 
     return () => {
-      ctx.revert();
+      mm.revert();
     };
   }, []);
 
   const scrollToPlans = useCallback(() => {
-    const target = document.getElementById("planos");
+    const target = document.getElementById("plans");
     if (!target) return;
     const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     target.scrollIntoView({ behavior: prefersReduced ? "auto" : "smooth" });
@@ -158,11 +170,14 @@ function FabricaDeMimosLanding() {
 
   const proceedToCheckout = useCallback(
     (plan: PlanConfig) => {
-      trackMetaPixelEvent(consent, "InitiateCheckout", {
+      const payload: Record<string, string | number> = {
         content_name: plan.name,
-        value: plan.price,
-        currency: "BRL",
-      });
+        currency: CAMPAIGN_CONFIG.currency,
+      };
+      if (isPlanPriceConfigured(plan.priceUsd)) {
+        payload["value"] = plan.priceUsd;
+      }
+      trackMetaPixelEvent(consent, "InitiateCheckout", payload);
 
       if (!isCheckoutConfigured(plan.checkoutUrl)) {
         setPendingPlaceholderPlan(plan);
@@ -175,27 +190,31 @@ function FabricaDeMimosLanding() {
     [consent, utms],
   );
 
-  const handleSelectEssential = useCallback(() => {
-    trackMetaPixelEvent(consent, "ViewContent", {
-      content_name: "Popup Upgrade Essencial para Premium R$20",
-      value: CAMPAIGN_CONFIG.plans.essentialUpgrade.price,
-      currency: "BRL",
-    });
+  const handleSelectBasic = useCallback(() => {
+    const upgrade = CAMPAIGN_CONFIG.plans.basicUpgrade;
+    const payload: Record<string, string | number> = {
+      content_name: "Basic to PRO Upgrade Modal",
+      currency: CAMPAIGN_CONFIG.currency,
+    };
+    if (isPlanPriceConfigured(upgrade.priceUsd)) {
+      payload["value"] = upgrade.priceUsd;
+    }
+    trackMetaPixelEvent(consent, "ViewContent", payload);
     setUpgradeModalOpen(true);
   }, [consent]);
 
-  const handleSelectPremium = useCallback(() => {
-    proceedToCheckout(CAMPAIGN_CONFIG.plans.premium);
+  const handleSelectPro = useCallback(() => {
+    proceedToCheckout(CAMPAIGN_CONFIG.plans.pro);
   }, [proceedToCheckout]);
 
   const handleAcceptUpgrade = useCallback(() => {
     setUpgradeModalOpen(false);
-    proceedToCheckout(CAMPAIGN_CONFIG.plans.essentialUpgrade);
+    proceedToCheckout(CAMPAIGN_CONFIG.plans.basicUpgrade);
   }, [proceedToCheckout]);
 
   const handleDeclineUpgrade = useCallback(() => {
     setUpgradeModalOpen(false);
-    proceedToCheckout(CAMPAIGN_CONFIG.plans.essential);
+    proceedToCheckout(CAMPAIGN_CONFIG.plans.basic);
   }, [proceedToCheckout]);
 
   const handleAcceptConsent = useCallback(() => {
@@ -220,19 +239,19 @@ function FabricaDeMimosLanding() {
         <CatalogAndEmotionSections />
         <SimulatorAndBonusesSections />
         <PricingAndTrustSections
-          onSelectEssential={handleSelectEssential}
-          onSelectPremium={handleSelectPremium}
+          onSelectBasic={handleSelectBasic}
+          onSelectPro={handleSelectPro}
           onJumpToPlans={scrollToPlans}
           consent={consent}
           onResetConsent={handleResetConsent}
         />
       </main>
 
-      <EssentialUpgradeModal
+      <BasicUpgradeModal
         open={upgradeModalOpen}
         onOpenChange={setUpgradeModalOpen}
         onAcceptUpgrade={handleAcceptUpgrade}
-        onDeclineAndContinueEssential={handleDeclineUpgrade}
+        onDeclineAndContinueBasic={handleDeclineUpgrade}
       />
 
       <CheckoutPlaceholderModal
